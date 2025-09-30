@@ -16,8 +16,8 @@ cd heart-sync-backend
 
 2. In order to run this application, you will need to have your own API credentials from Spotify and LastFM. Instructions for each can be found here:
 
-* <a href="https://developer.spotify.com/documentation/web-api/tutorials/getting-started">Spotify</a>
-* <a href="https://www.last.fm/api#getting-started">LastFM</a>
+* <a href="https://developer.spotify.com/documentation/web-api/tutorials/getting-started" target="_blank">Spotify</a>
+* <a href="https://www.last.fm/api#getting-started" target="_blank">LastFM</a>
 
 3. Once you have the required credentials, create a `.env` file in the root of the directory. Add the following variables with your personal credentials:
 
@@ -28,7 +28,7 @@ CLIENT_ID=<client_id>
 CLIENT_SECRET=<client_secret>
 REDIRECT_URI=<redirect_uri>
 
-AUTH_URL=<https://accounts.spotify.com/authorize
+AUTH_URL=https://accounts.spotify.com/authorize
 TOKEN_URL=https://accounts.spotify.com/api/token
 API_BASE_URL=https://api.spotify.com/v1/
 
