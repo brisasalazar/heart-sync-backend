@@ -30,3 +30,4 @@ router.post("/login", async (req, res) => {
 })
 
 //exports
+module.exports = router;
