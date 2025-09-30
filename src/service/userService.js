@@ -10,7 +10,7 @@ async function validateLogin(username, password) {
     }
 
     const user = await getUserByUsername(username);
-    if (user && (await bycrypt.compare(password, user.password))) {
+    if (user && (await bcrypt.compare(password, user.password))) {
         logger.info(`User logged in successfully`);
         return employee;
     } else {

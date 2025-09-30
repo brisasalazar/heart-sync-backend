@@ -13,6 +13,12 @@ const logger = createLogger({
     ]
 });
 
+function loggerMiddleware(req, res, next){
+    logger.info(`Incoming ${req.method} : ${req.url}`);
+    next();
+}
+
 module.exports = {
-    logger
+    logger,
+    loggerMiddleware
 }
