@@ -9,10 +9,11 @@ async function validateLogin(username, password) {
         return null;
     }
 
+    // could alternatively get the user by their ID
     const user = await getUserByUsername(username);
     if (user && (await bcrypt.compare(password, user.password))) {
         logger.info(`User logged in successfully`);
-        return employee;
+        return user;
     } else {
         logger.info(`User credentials mismatch`);
         return null;

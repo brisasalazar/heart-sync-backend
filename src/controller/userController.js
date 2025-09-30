@@ -1,7 +1,10 @@
 //imports
 const express = require("express");
 const router = new express.Router();
+const jwt = require('jsonwebtoken');
 const {logger} = require("../util/logger");
+
+const secretKey = "my-secret-key"
 
 // local imports
 const userService = require("../service/userService");
