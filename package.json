@@ -9,6 +9,15 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.883.0",
+    "@aws-sdk/lib-dynamodb": "^3.883.0",
+    "bcrypt": "^6.0.0",
+    "bootstrap": "^5.3.8",
+    "express": "^5.1.0",
+    "jest": "^30.1.3",
+    "jsonwebtoken": "^9.0.2",
+    "mdb-ui-kit": "^9.2.0",
+    "uuid": "^13.0.0",
     "winston": "^3.17.0"
   }
 }

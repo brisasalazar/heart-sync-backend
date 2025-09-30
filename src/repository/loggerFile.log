@@ -1,0 +1,18 @@
+{
+  message: 'SCAN command to database complete {"$metadata":{"httpStatusCode":200,"requestId":"P0KHTTTGHAJ1ON7JF016QFI2BRVV4KQNSO5AEMVJF66Q9ASUAAJG","attempts":1,"totalRetryDelay":0},"Count":1,"Items":[{"following":{},"SK":"METADATA","password":"aMcMUfR1KD5V2KQY","username":"nnamdionyeije","PK":"USER#user5dbd0e3b-6718-46ca-9867-f2df7765fea5","email":"nnamdi959@revature.net"}],"ScannedCount":8}',
+  level: 'info',
+  label: 'HeartSync Backend',
+  timestamp: '2025-09-30T19:30:10.026Z'
+}
+{
+  message: 'SCAN command to database complete {"$metadata":{"httpStatusCode":200,"requestId":"R5COFRPAUVPEC1108SM3VIFL63VV4KQNSO5AEMVJF66Q9ASUAAJG","attempts":1,"totalRetryDelay":0},"Count":1,"Items":[{"following":{},"SK":"METADATA","password":"aMcMUfR1KD5V2KQY","username":"revature101","PK":"USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef","email":"example@revature.net"}],"ScannedCount":8}',
+  level: 'info',
+  label: 'HeartSync Backend',
+  timestamp: '2025-09-30T19:30:44.480Z'
+}
+{
+  message: 'SCAN command to database complete {"$metadata":{"httpStatusCode":200,"requestId":"MS0RSVE17OAQ4M4AVMT2EE6ATBVV4KQNSO5AEMVJF66Q9ASUAAJG","attempts":1,"totalRetryDelay":0},"Count":0,"Items":[],"ScannedCount":8}',
+  level: 'info',
+  label: 'HeartSync Backend',
+  timestamp: '2025-09-30T19:31:24.005Z'
+}
