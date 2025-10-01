@@ -1,6 +1,6 @@
 # HeartSync Backend 
-A playlist-building platform. HeartSync is an application which users may utilize in order to create customized playlists for cardiovascular activity based on their statistics and personal preference. Users can create an account, upload workout stats, and receive playlists centered around their average cadence/heart rate, distance travelled, and time.
- 
+A playlist-building platform with a physical-activity focus. HeartSync is an application which users may utilize in order to create customized physical activity playlists based upon their personal preferences. Users can create an account, receive playlists centered around their favorite artists, genres, and preferred duration, and they can share playlists as “posts” with their followers.
+
 This repository handles the backend logic of HeartSync.
 
 ## Getting Started

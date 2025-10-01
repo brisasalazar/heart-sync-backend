@@ -1,6 +1,7 @@
 // service layer 
-const {logger} = require("../util/logger");
+const {logger} = require("../utillogger");
 const postRepository = require("../repository/postRepository");
+const userService = require("../service/userService");
 
 // ensure post has neccessary attributes (
 // playlist link 
@@ -12,6 +13,7 @@ function validatePost(postInfo){
     const activityType = postInfo.pst_activityType;
     return playlistLink && activityType;   
 }
+
 // get all posts from specific user 
 async function getPostsFromUser(userID){
     const data = await postRepository.getPostsFromUser(userID);
@@ -24,12 +26,13 @@ async function getPostsFromUser(userID){
 }
 
 //create post
-// get the user id as sort key (in controller layer from jwt)
-async function createPost(userID, postInfo){
+async function createPost(username, postInfo){
+    const user = await userService.getUserByUsername(username);
     if (validatePost){
         const data = await postRepository.putPost({
-            PK: crypto.randomUUID(),
-            SK: userID,
+            PK: user.PK,
+            SK: crypto.randomUUID(),
+            username: username,
             playlist_spotifyURI: postInfo.playlist_spotifyURI,
             pst_caption: postInfo.pst_caption,
             ... postInfo
@@ -47,8 +50,9 @@ async function createPost(userID, postInfo){
 }
 
 // delete post
-async function deletePost(postID){
-    const data = postRepository.deletePost(postID);
+async function deletePost(username, postID){
+    const user = await userService.getUserByUsername(username);
+    const data = postRepository.deletePost(user.PK, postID);
     if (data){
         logger.info(`Successfully deleted post`, data);
         return data;
