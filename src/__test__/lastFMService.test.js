@@ -43,12 +43,23 @@ describe("LastFM service layer", () => {
         test("Handles invalid response shape", async () => {
             // Arrange
             const mockTracks = {
-                invalidKey: "Invalid value"
+                invalidKey: {}
             };
 
             fetch.mockResolvedValueOnce({
                 json: () => Promise.resolve(mockTracks)
             });
+
+            // Act
+            const result = await getTracksByGenre("genre");
+
+            // Assert
+            expect(result).toBe(null);
+        });
+
+        test("Handles API client error response", async () => {
+            // Arrange
+            fetch.mockResolvedValueOnce(new Error("Client error"));
 
             // Act
             const result = await getTracksByGenre("genre");
@@ -83,7 +94,7 @@ describe("LastFM service layer", () => {
         test("Handles invalid response shape", async () => {
             // Arrange
             const mockTracks = {
-                invalidKey: "Invalid value"
+                invalidKey: {}
             };
 
             fetch.mockResolvedValueOnce({
@@ -92,6 +103,17 @@ describe("LastFM service layer", () => {
 
             // Act
             const result = await getTracksByArtist("artist");
+
+            // Assert
+            expect(result).toBe(null);
+        });
+
+        test("Handles API client error response", async () => {
+            // Arrange
+            fetch.mockResolvedValueOnce(new Error("Client error"));
+
+            // Act
+            const result = await getTracksByArtist("genre");
 
             // Assert
             expect(result).toBe(null);
