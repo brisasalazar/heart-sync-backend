@@ -140,3 +140,29 @@ describe("User Login Suite", () => {
         expect(loginValidation).toBeNull();
     })
 })
+
+describe("User Update Suite", () => {
+
+// Users can edit account details
+    // description
+    // 
+
+})
+
+describe("User Deletion Suite", () => {
+    beforeEach(() => {
+        //userRepository.postUser.mockReturnValue(null);
+        //userRepository.getUserByUsername.mockClear();
+        //userRepository.getUserbyId.mockClear(null);
+    })
+
+    test("deleting a valid user should return their user object", async () => {
+        
+    });
+
+    // must be logged in to delete a user
+    // cannot delete a different user
+    // Possibly even have them type in their password in order to delete a user
+
+    test("")
+})
