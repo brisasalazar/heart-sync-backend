@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { getUser, getPlaylists, getTrackURI } = require("../service/spotifyService.js");
+const { getUser, getPlaylists, getTrackURI, getTokenInfo } = require("../service/spotifyService.js");
 const { getAuthHeaders } = require("../util/auth.js");
 
 // Mock getAuthHeaders()
@@ -87,6 +87,31 @@ describe("Spotify service layer", () => {
 
             // Assert
             expect(result).toBe(mockSpotifyURI);
+
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(getAuthHeaders).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("getTokenInfo function", () => {
+        test("Successfully returns session token info", async () => {
+            // Arrange
+            const mockCode = "code";
+            const mockTokenInfo = {
+                accessToken: "accessToken",
+                refreshToken: "refreshToken",
+                expiresIn: "expiresIn"
+            }
+
+            axios.post.mockResolvedValueOnce({
+                data: mockTokenInfo
+            });
+
+            // Act
+            const result = await getTokenInfo(mockCode);
+
+            // Assert
+            expect(result).toBe(mockTokenInfo);
         });
     });
 });
