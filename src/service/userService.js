@@ -4,6 +4,40 @@ const {logger} = require("../util/logger");
 
 
 // logic
+
+async function postUser(user) {
+    const saltRounds = 10;
+
+    // validate the user and check if the username is already taken
+    if (user && await validateUser(user)) {
+        const password = await bcrypt.hash(user.password, saltRounds);
+
+        const data = await userRepository.postUser({
+            username: user.username,
+            password,
+            email: user.email,
+            PK: "USER#user" + crypto.randomUUID(),
+            SK: "METADATA",
+            //following: [''],
+            // DynamoDB does not support empty string sets
+            // we can initialize users without 'following' and 'follower' arrays, and simply update them when necessary
+        })
+
+        if (data) {
+            logger.info(`Creating new user: ${JSON.stringify(data)}`);
+            return data;
+        } else {
+            logger.info(`Failed to create new user: ${JSON.stringify(user)}`);
+            return null;
+        }
+    } else {
+        logger.info(`Failed to validate user: ${JSON.stringify(user)}`);
+        return null;
+    }
+}
+
+
+// This is a helper function
 async function validateLogin(username, password) {
     if (!username || !password) {
         return null;
@@ -37,9 +71,23 @@ async function getUserByUsername(username) {
     }
 }
 
+async function validateUser(user) {
+    const usernameCheck = await (getUserByUsername(user.username));
+    if (user && !usernameCheck) {
+        const usernameResult = user.username.length > 0;
+        const passwordResult = user.password.length > 0;
+
+        return (usernameResult && passwordResult && (usernameCheck === null));
+    } else {
+        logger.info(`Invalid User Object`);
+        return false;
+    }
+}
+
 
 // exports
 module.exports = {
+    postUser,
     validateLogin,
     getUserByUsername,
 }
