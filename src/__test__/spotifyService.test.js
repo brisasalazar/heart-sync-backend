@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { getUser, getPlaylists } = require("../service/spotifyService.js");
+const { getUser, getPlaylists, getTrackURI } = require("../service/spotifyService.js");
 const { getAuthHeaders } = require("../util/auth.js");
 
 // Mock getAuthHeaders()
@@ -62,6 +62,31 @@ describe("Spotify service layer", () => {
 
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("getTrackURI function", () => {
+        test("Successfully returns a Spotify URI given a track and artist", async () => {
+            // Arrange
+            const mockArtist = "artist";
+            const mockTrack = "track";
+            const mockSpotifyURI = "spotifyId";
+
+            axios.get.mockResolvedValueOnce({
+                data: {
+                    tracks: {
+                        items: [
+                            { uri: mockSpotifyURI }
+                        ]
+                    }
+                }
+            });
+
+            // Act
+            const result = await getTrackURI(mockArtist, mockTrack);
+
+            // Assert
+            expect(result).toBe(mockSpotifyURI);
         });
     });
 });
