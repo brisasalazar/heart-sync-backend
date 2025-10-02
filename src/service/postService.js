@@ -1,5 +1,5 @@
 // service layer 
-const {logger} = require("../utillogger");
+const {logger} = require("../util/logger");
 const postRepository = require("../repository/postRepository");
 const userService = require("../service/userService");
 
@@ -22,6 +22,7 @@ async function getPostsFromUser(userID){
         return data;
     } else{
         logger.error(`Unable to get posts from user.`);
+        return null;
     }
 }
 
@@ -46,6 +47,7 @@ async function createPost(username, postInfo){
         }
     } else {
         logger.error(`Missing fields.`, data);
+        return null;
     }
 }
 

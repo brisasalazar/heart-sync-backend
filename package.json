@@ -10,8 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.883.0",
-    "@aws-sdk/lib-dynamodb": "^3.883.0",
+    "@aws-sdk/client-dynamodb": "^3.901.0",
+    "@aws-sdk/lib-dynamodb": "^3.901.0",
     "bcrypt": "^6.0.0",
     "bootstrap": "^5.3.8",
     "express": "^5.1.0",
