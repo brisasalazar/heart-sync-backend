@@ -1,17 +1,17 @@
 const { getTrackURI, addTracksToPlaylist } = require("./spotifyService.js");
-const { getRandomizedTracksByGenre, getRandomizedTracksByArtist } = require("./lastFMService.js");
+const { getTracksByGenre, getTracksByArtist } = require("./lastFMService.js");
 
 async function populatePlaylist(playlistId, genre, artist) {
     let tracks = [];
     const spotifyURIs = [];
 
     if (genre) {
-        const tracksByGenre = await getRandomizedTracksByGenre(genre);
+        const tracksByGenre = await getTracksByGenre(genre);
         tracks = [...tracks, ...tracksByGenre];
     }
 
     if (artist) {
-        const tracksByArtist = await getRandomizedTracksByArtist(artist);
+        const tracksByArtist = await getTracksByArtist(artist);
         tracks = [...tracks, ...tracksByArtist];
     }
 
