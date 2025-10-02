@@ -112,6 +112,7 @@ describe("Spotify service layer", () => {
 
             // Assert
             expect(result).toBe(mockTokenInfo);
+            expect(axios.post).toHaveBeenCalledTimes(1);
         });
     });
 });
