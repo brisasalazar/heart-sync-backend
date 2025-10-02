@@ -41,7 +41,7 @@ async function getPlaylists() {
     return response.data;
 }
 
-async function createPlaylist(userId, name, public, collaborative, description) {
+async function createPlaylist(userId, name, isPublic, isCollaborative, description) {
     const headers = {
         ...getAuthHeaders(),
         "Content-Type": "application/json"
@@ -49,8 +49,8 @@ async function createPlaylist(userId, name, public, collaborative, description) 
 
     const body = {
         name,
-        public,
-        collaborative,
+        isPublic,
+        isCollaborative,
         description
     };
 
