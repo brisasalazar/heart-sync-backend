@@ -34,7 +34,7 @@ describe("Spotify service layer", () => {
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
         });
-
+      
         test("returns nulls when error occurs", async()=>{
             axios.get.mockRejectedValue(new Error("error"));
 
@@ -76,7 +76,7 @@ describe("Spotify service layer", () => {
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
         });
-
+      
          test("should throw error if axios fails", async()=>{
             axios.get.mockRejectedValue(new Error("error"));
 
@@ -113,7 +113,7 @@ describe("Spotify service layer", () => {
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
         });
-
+      
         test("should return null when no tracks returned", async() =>{
             // Brisa will finish this up 
         });

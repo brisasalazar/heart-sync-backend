@@ -8,6 +8,7 @@ const secretKey = "my-secret-key"
 
 // local imports
 const userService = require("../service/userService");
+const { authenticateToken, decodeJWT } = require("../util/jwt");
 
 //logic
 
@@ -31,8 +32,9 @@ router.post("/login", async (req, res) => {
     if (data) {
         const token = jwt.sign(
             {
-                id: data.user_id,
+                id: data.PK,
                 username,
+                email: data.email,
             },
             secretKey,
             {
@@ -40,11 +42,49 @@ router.post("/login", async (req, res) => {
             }
         );
 
+        console.log(await decodeJWT(token));
+
         res.status(200).json({message: "you have logged in", token});
     } else {
         res.status(401).json({message: "invalid login"});
     };
 })
+
+// User Update Route
+// My guess is that we can just pass in the field to be updated with a single controller method
+// then we can just have specific logic in the DAO to manage the request itself
+router.put("/description", validateLoginStatus, async (req, res) => {
+    const {description} = req.body;
+    // get the values from the token, namely the userID
+    const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
+
+    // we have already checked to see if the user is logged in
+    // we should check that they are logged in as the specific user they plan to update
+
+    const data = await userService.updateUserDescription(localTranslatedToken.id, description);
+    if (data) {
+        res.status(201).json({message: "User has been updated successfully", data: data});
+    } else {
+        res.status(400).json({message: "failed to update user", data: req.body});
+    }
+})
+
+async function validateLoginStatus(req, res, next) {
+    
+    const currentToken = req.headers['authorization'].split(" ")[1];
+
+    if (currentToken) {
+        const translatedToken = await decodeJWT(currentToken);
+        if(!translatedToken) {
+            res.status(400).json({message: "Invalid token"});
+        } else {
+            // currently no check for user role since we aren't implementing a manager function
+            next();
+        }
+    } else {
+        res.status(400).json({message: "You are not logged in as a user"});
+    }
+}
 
 async function validatePostUser(req, res, next) {
     const user = req.body;
