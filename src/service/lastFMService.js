@@ -1,3 +1,4 @@
+const axios = require("axios");
 const { logger } = require("../util/logger.js");
 
 async function getTracksByGenre(genre) {
@@ -10,11 +11,9 @@ async function getTracksByGenre(genre) {
         });
         const url = `${process.env.LASTFM_API_BASE_URL}/?${queryParams}`;
 
-        const data = await fetch(url)
-            .then((res) => res.json())
-            .then((data) => data);
+        const response = await axios.get(url);
 
-        return data.tracks.track;
+        return response.data?.tracks?.track ?? null;
     } catch (error) {
         logger.error(`Error fetching tracks by genre in lastFMService.js: ${error.message}`);
         return null;
@@ -31,11 +30,9 @@ async function getTracksByArtist(artist) {
         });
         const url = `${process.env.LASTFM_API_BASE_URL}/?${queryParams}`;
 
-        const data = await fetch(url)
-            .then((res) => res.json())
-            .then((data) => data);
+        const response = await axios.get(url);
 
-        return data.toptracks.track;
+        return response.data?.toptracks?.track ?? null;
     } catch (error) {
         logger.error(`Error fetching tracks by artist in lastFMService.js: ${error.message}`);
         return null;
