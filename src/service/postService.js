@@ -14,6 +14,22 @@ function validatePost(postInfo){
     return playlistLink && activityType;   
 }
 
+// get a user's feed/timeline 
+async function getUserFeed(userID){
+    const user = await userService.getUserById(userID);
+    const followingList = user.usr_following;
+    const feed = []
+    for (var user_id of followingList){
+        const data = await postRepository.getPostsFromUser(user_id);
+        if(data){
+            for (var post of data.Items){
+                feed.push(post);
+            }
+        }
+    }
+    return feed.sort().reverse();
+}
+
 // get all posts from specific user 
 async function getPostsFromUser(userID){
     const data = await postRepository.getPostsFromUser(userID);
@@ -36,6 +52,7 @@ async function createPost(username, postInfo){
             username: username,
             playlist_spotifyURI: postInfo.playlist_spotifyURI,
             pst_caption: postInfo.pst_caption,
+            pst_timestamp: Date.now(),
             ... postInfo
         });
          if (data){
@@ -64,4 +81,4 @@ async function deletePost(username, postID){
     }
 }
 
-module.exports = {createPost, deletePost, getPostsFromUser};
+module.exports = {createPost, deletePost, getPostsFromUser, getUserFeed};
