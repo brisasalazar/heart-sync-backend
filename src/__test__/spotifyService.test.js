@@ -206,7 +206,30 @@ describe("Spotify service layer", () => {
         });
 
         test("Returns null when playlist ID is not provided", async () => {
-            // Working on this after lunch
+            // Arrange
+            const mockPlaylistId = "";
+            const mockTrackURIs = [
+                "spotifyURI 1",
+                "spotifyURI 2"
+            ];
+
+            axios.post.mockRejectedValueOnce({
+                response: {
+                    status: 400,
+                    data: {
+                        error: "Invalid playlist ID."
+                    }
+                }
+            });
+
+            // Act
+            const result = await addTracksToPlaylist(mockPlaylistId, mockTrackURIs);
+
+            // Assert
+            expect(result).toBeNull();
+
+            expect(axios.post).toHaveBeenCalledTimes(1);
+            expect(logger.error).toHaveBeenCalledTimes(1);
         });
 
         test("Returns null when authorization token is expired", async () => {
