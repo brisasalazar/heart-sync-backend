@@ -5,6 +5,18 @@ const postService = require("../service/postService");
 const {authenticateToken} = require("../util/jwt");
 const { logger } = require("../util/logger");
 
+//get feed for current user  
+router.get("/feed", authenticateToken, async(req, res) =>{
+    const user = req.user;
+    console.log(user);
+    const data = await postService.getUserFeed(user.id);
+    if (data){
+        res.status(200).json({message: `User feed for ${user.username}`, data: data});
+    } else {
+        res.status(400).json({message: `Unable to retrieve feed for ${user.username}. Try again.`});
+    }
+})
+
 //get posts from certain user 
 router.get("/post-history", authenticateToken, async(req, res) =>{
     const {userID} = req.query;
