@@ -54,6 +54,25 @@ async function updateUserDescription(user_id, newDescription) {
     }
 }
 
+async function deleteUser(user_id, password) {
+    if (await validateUserDeletion(user_id, password)) {
+
+        const data = await userRepository.deleteUser(user_id);
+
+        if (data) {
+            logger.info(`User has been deleted: ${JSON.stringify(data)}`);
+            return data;
+        } else {
+            logger.info(`Failed to delete user: ${JSON.stringify(user_id)}`);
+            return null;
+        }
+        
+    } else {
+        logger.info(`Failed to delete user: ${JSON.stringify(user_id)}`);
+        return null;
+    }
+}
+
 async function getUserById(user_id) {
     if (user_id) {
         const data = await userRepository.getUserbyUserId(user_id);
@@ -70,6 +89,21 @@ async function getUserById(user_id) {
     }
 }
 
+async function getUserByUsername(username) {
+    if (username) {
+        const data = await userRepository.getUserByUsername(username);
+        if(data) {
+            logger.info(`User found by username: ${JSON.stringify(data)}`);
+            return data;
+        } else {
+            logger.info(`User not found by username: ${username}`);
+            return null;
+        }
+    } else {
+        logger.info(`Invalid Username`);
+        return null;
+    }
+}
 
 // This is a helper function
 async function validateLogin(username, password) {
@@ -88,23 +122,6 @@ async function validateLogin(username, password) {
     }
 }
 
-
-async function getUserByUsername(username) {
-    if (username) {
-        const data = await userRepository.getUserByUsername(username);
-        if(data) {
-            logger.info(`User found by username: ${JSON.stringify(data)}`);
-            return data;
-        } else {
-            logger.info(`User not found by username: ${username}`);
-            return null;
-        }
-    } else {
-        logger.info(`Invalid Username`);
-        return null;
-    }
-}
-
 async function validateUser(user) {
     const usernameCheck = await (getUserByUsername(user.username));
     if (user && !usernameCheck) {
@@ -112,6 +129,9 @@ async function validateUser(user) {
         const passwordResult = user.password.length > 0;
 
         return (usernameResult && passwordResult && (usernameCheck === null));
+    } else if (user && usernameCheck) {
+        logger.info(`User already exists with that username`);
+        return false;
     } else {
         logger.info(`Invalid User Object`);
         return false;
@@ -122,12 +142,26 @@ async function validateUpdateUserDescription(user_id, newDescription) {
     if (!user_id || !newDescription) {
         return null;
     }
-
     const userCheck = await getUserById(user_id);
     // could potentially cut down the possible description length to 500 characters.
-    return (userCheck && newDescription.length > 0);
+    return (userCheck && newDescription.length > 0)
+}
 
-    
+async function validateUserDeletion(user_id, password) {
+    if (!user_id || !password) {
+        return null;
+    }
+    const userCheck = await getUserById(user_id);
+
+    if (userCheck && (await bcrypt.compare(password, userCheck.password))) {
+        logger.info(`User Deletion Validated`)
+        return true;
+    } else {
+        logger.info(`User Deletion Could Not Be Validated`);
+        return false;
+    }
+
+
 }
 
 // exports
@@ -136,5 +170,6 @@ module.exports = {
     validateLogin,
     getUserByUsername,
     getUserById,
-    updateUserDescription
+    updateUserDescription,
+    deleteUser,
 }

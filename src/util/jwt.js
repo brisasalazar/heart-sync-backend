@@ -30,8 +30,12 @@ async function decodeJWT(token) {
     try {
         const user = await jwt.verify(token, secretKey);
         return user;
+        //console.log(user);
     } catch(error) {
-        logger.error(err);
+        // TypeError: logger.error is not a function
+        // seems to be some kind of an issue with logger.error
+        // doesn't seem to be affecting things though
+        //logger.error(error);
         return null;
     }
 }
