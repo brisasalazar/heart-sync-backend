@@ -1,6 +1,7 @@
 const axios = require("axios");
-const { getUser, getPlaylists, getTrackURI, getTokenInfo } = require("../service/spotifyService.js");
+const { getUser, getPlaylists, getTrackURI, getTokenInfo, refreshToken } = require("../service/spotifyService.js");
 const { getAuthHeaders } = require("../util/auth.js");
+const {logger} = require("../util/logger.js")
 
 // Mock getAuthHeaders()
 jest.mock("../util/auth.js", () => ({
@@ -9,6 +10,9 @@ jest.mock("../util/auth.js", () => ({
 
 // Mock axios library
 jest.mock("axios");
+
+// Mock logger
+jest.mock("../util/logger.js")
 
 describe("Spotify service layer", () => {
     beforeEach(() => {
@@ -29,6 +33,15 @@ describe("Spotify service layer", () => {
 
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
+        });
+      
+        test("returns nulls when error occurs", async()=>{
+            axios.get.mockRejectedValue(new Error("error"));
+
+            const result = await getUser();
+
+            expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalledWith(new Error("error"))
         });
     });
 
@@ -63,6 +76,15 @@ describe("Spotify service layer", () => {
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
         });
+      
+         test("should throw error if axios fails", async()=>{
+            axios.get.mockRejectedValue(new Error("error"));
+
+            const result = await getUser();
+
+            expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalledWith(new Error("error"))
+        });
     });
 
     describe("getTrackURI function", () => {
@@ -91,6 +113,14 @@ describe("Spotify service layer", () => {
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
         });
+      
+        test("should return null when no tracks returned", async() =>{
+            // Brisa will finish this up 
+        });
+
+        test("should throw error and return null when axios fails", async()=>{
+            // brisa will finsih this up
+        });
     });
 
     describe("getTokenInfo function", () => {
@@ -114,5 +144,24 @@ describe("Spotify service layer", () => {
             expect(result).toBe(mockTokenInfo);
             expect(axios.post).toHaveBeenCalledTimes(1);
         });
+
+        test("should return null with invalid input params", async()=>{
+            axios.get.mockResolvedValue(null);
+
+            const result = await getTokenInfo(null);
+
+            expect(result).toBeNull();
+        });
     });
+
+     describe("refreshToken()",()=>{
+        test("should return null with invalid input params", async()=>{
+            axios.get.mockResolvedValue(null);
+
+            const result = await refreshToken(null);
+
+            expect(result).toBeNull();
+        });
+    });
+    
 });
