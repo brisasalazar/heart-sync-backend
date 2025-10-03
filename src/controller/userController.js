@@ -19,7 +19,7 @@ router.post("/", validatePostUser, async (req, res) => {
     if (data) {
         res.status(201).json({message: `Created User ${JSON.stringify(data)}`});
     } else {
-        res.status(400).json({message: "Employee not created", data: req.body});
+        res.status(400).json({message: "User not created", data: req.body});
     }
 });
 
@@ -69,9 +69,23 @@ router.put("/description", validateLoginStatus, async (req, res) => {
     }
 })
 
+router.delete("/", validateLoginStatus, async (req, res) => {
+    const {password} = req.body;
+
+    const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
+
+    const data = await userService.deleteUser(localTranslatedToken.id, password);
+    if (data) {
+        data.password = password;
+        res.status(201).json({message: "User has been deleted successfully", data: data});
+    } else {
+        res.status(400).json({message: "failed to delete user", data: req.body});
+    }
+})
+
 async function validateLoginStatus(req, res, next) {
     
-    const currentToken = req.headers['authorization'].split(" ")[1];
+    const currentToken = req.headers['authorization']?.split(" ")[1];
 
     if (currentToken) {
         const translatedToken = await decodeJWT(currentToken);

@@ -103,6 +103,13 @@ describe("User Login Suite", () => {
             PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
             email: 'example@revature.net'
         })
+
+        const dummyUsername = "revature101";
+        const dummyPassword = "pass1";
+
+        const loginValidation = await userService.validateLogin(dummyUsername, dummyPassword);
+        expect(userRepository.getUserByUsername).toHaveBeenCalled();
+        expect(loginValidation.username).toBe(dummyUsername);
     })
     
      test("Validating Login with invalid Username or Password returns null", async () => {
@@ -141,28 +148,162 @@ describe("User Login Suite", () => {
     })
 })
 
-describe("User Update Suite", () => {
+describe("User Update Description Suite", () => {
 
 // Users can edit account details
-    // description
-    // 
+    test("Updating a user's description should return an object with a new description", async () => {
+        userRepository.updateUserFields.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            description: "This is the new updated description",
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
 
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+        const dummyDescription = "This is the new updated description";
+
+        const updatedUser = await userService.updateUserDescription(dummyUserId, dummyDescription);
+        expect(userRepository.updateUserFields).toHaveBeenCalled();
+        expect(updatedUser.description).toBe(dummyDescription);
+    })
+
+    test("Updating a user's description with a null user_id or description should return null", async () => {
+        const dummyUserId = null;
+        const dummyDescription = "This is the new updated description";
+
+        const updatedUser = await userService.updateUserDescription(dummyUserId, dummyDescription);
+        expect(updatedUser).toBeNull;
+    })
+
+    test("Updating a user's description with an invalid user_id should return null", async () => {
+        userRepository.getUserbyUserId.mockReturnValue(null);
+
+        const dummyUserId = "USER#user///54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+        const dummyDescription = "This is the new updated description";
+
+        const updatedUser = await userService.updateUserDescription(dummyUserId, dummyDescription);
+        expect(userRepository.getUserbyUserId).toHaveBeenCalled();
+        expect(updatedUser).toBeNull;
+
+    })
+
+    test("Handling server side errors", async () => {
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        userRepository.updateUserFields.mockReturnValue(null);
+
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+        const dummyDescription = "This is the new updated description";
+
+        const updatedUser = await userService.updateUserDescription(dummyUserId, dummyDescription);
+        expect(userRepository.getUserbyUserId).toHaveBeenCalled();
+        expect(userRepository.updateUserFields).toHaveBeenCalled();
+
+        expect(updatedUser).toBeNull;
+    })
 })
 
 describe("User Deletion Suite", () => {
     beforeEach(() => {
         //userRepository.postUser.mockReturnValue(null);
         //userRepository.getUserByUsername.mockClear();
-        //userRepository.getUserbyId.mockClear(null);
+        userRepository.getUserbyUserId.mockReturnValue(null);
+        userRepository.deleteUser.mockReturnValue(null);
     })
 
     test("deleting a valid user should return their user object", async () => {
-        
+        userRepository.getUserbyUserId.mockReturnValue({
+            SK: 'METADATA',
+            password: '$2b$10$YhgBdJ0bAIKMZrzukbMp8.iBQP3gXagXL/JuKGmtWrQrv0roNl6w2',
+            username: 'user2',
+            PK: 'USER#useraa202bd5-4b05-427e-8f1d-9997fef3a23f',
+            description: 'I am User 2 and I love listening to Salsa music',
+            email: 'user2@revature.com'
+        });
+
+        userRepository.deleteUser.mockReturnValue({
+            SK: 'METADATA',
+            password: '$2b$10$YhgBdJ0bAIKMZrzukbMp8.iBQP3gXagXL/JuKGmtWrQrv0roNl6w2',
+            username: 'user2',
+            PK: 'USER#useraa202bd5-4b05-427e-8f1d-9997fef3a23f',
+            description: 'I am User 2 and I love listening to Salsa music',
+            email: 'user2@revature.com'
+        });
+
+
+        const dummyUserId = "USER#useraa202bd5-4b05-427e-8f1d-9997fef3a23f";
+        const dummyPassword = "pass1";
+
+        const deletedUser = await userService.deleteUser(dummyUserId, dummyPassword);
+        expect(deletedUser.PK).toBe(dummyUserId);
+
     });
 
+    test("Trying to delete a user with a null user_id or password will return null", async () => {
+        const dummyUserId = "USER#useraa202bd5-4b05-427e-8f1d-9997fef3a23f";
+        const dummyPassword = null;
+
+        const deletedUser = await userService.deleteUser(dummyUserId, dummyPassword);
+        expect(deletedUser).toBeNull();
+    }) 
+
+    test("Trying to delete a user by sending the wrong password will return null", async () => {
+        userRepository.getUserbyUserId.mockReturnValue({
+            SK: 'METADATA',
+            password: '$2b$10$YhgBdJ0bAIKMZrzukbMp8.iBQP3gXagXL/JuKGmtWrQrv0roNl6w2',
+            username: 'user2',
+            PK: 'USER#useraa202bd5-4b05-427e-8f1d-9997fef3a23f',
+            description: 'I am User 2 and I love listening to Salsa music',
+            email: 'user2@revature.com'
+        });
+        // have a check in the service layer that the password send in is equal to the one in the database
+        
+        const dummyUserId = "USER#useraa202bd5-4b05-427e-8f1d-9997fef3a23f";
+        const dummyPassword = "passOne";
+
+        const deletedUser = await userService.deleteUser(dummyUserId, dummyPassword);
+        expect(deletedUser).toBeNull();
+    })
+
+    test("Trying to delete a user by sending the wrong user_id will return null", async () => {
+        // not sure if this is even possible
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        const dummyUserId = "USER#useraa202bd5-4b05-427e-8f1d-9997fef3a23f";
+        const dummyPassword = "pass1";
+
+        const deletedUser = await userService.deleteUser(dummyUserId, dummyPassword);
+        expect(deletedUser).toBeNull();
+    })
     // must be logged in to delete a user
     // cannot delete a different user
     // Possibly even have them type in their password in order to delete a user
 
-    test("")
+    // test("")
 })

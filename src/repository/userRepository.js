@@ -1,7 +1,7 @@
 //imports 
 const {logger} = require("../util/logger");
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, PutCommand, ScanCommand, QueryCommand, UpdateCommand} = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, PutCommand, ScanCommand, QueryCommand, UpdateCommand, DeleteCommand} = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({region: "us-east-1"});
 const documentClient = DynamoDBDocumentClient.from(client);
@@ -97,11 +97,29 @@ async function updateUserFields(user_id, updateFields) {
     }
 }
 
-// async function updateUserDescriptionTest(user_id, newDescription) {
-//     console.log(await updateUserDescription(user_id, newDescription));
-// }
+async function deleteUser(user_id) {
+    const command = new DeleteCommand({
+        TableName,
+        Key: {
+            PK: user_id,
+            SK: 'METADATA'
+        },
+        ReturnValues: 'ALL_OLD',
+        // returns the actual values of the item(s) that are deleted
+    })
 
-// updateUserDescriptionTest("USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef", "Hey Everyone, this is my new description!");
+    try {
+        const data = await documentClient.send(command);
+        logger.info(`DELETE command to databse complete ${JSON.stringify(data.Attributes)}`);
+        //console.log(data.Attributes);
+        return data.Attributes;
+    }catch(error){
+        logger.error(error);
+        return null;
+    }
+}
+
+//deleteUser("USER#useraa30497e-5e04-4f07-a846-5335858760de");
 
 
 async function getUserByUsername(username) {
@@ -148,6 +166,7 @@ async function getUserbyUserId(user_id) {
     try{
         const data = await documentClient.send(command);
         logger.info(`Query command to database complete ${JSON.stringify(data)}`);
+        console.log(data.Items[0]);
         return data.Items[0];
     } catch(error) {
         logger.error(error);
@@ -156,7 +175,7 @@ async function getUserbyUserId(user_id) {
 }
 
 
-
+//getUserbyUserId("USER#useraa202bd5-4b05-427e-8f1d-9997fef3a23f");
 
 
 //exports
@@ -166,4 +185,5 @@ module.exports = {
     getUserbyUserId,
     updateUserDescription,
     updateUserFields,
+    deleteUser,
 }
