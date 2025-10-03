@@ -115,7 +115,12 @@ describe("Spotify service layer", () => {
         });
       
         test("should return null when no tracks returned", async() =>{
-            // Brisa will finish this up 
+             axios.get.mockResolvedValueOnce({
+                data: {
+                    tracks: {
+                        items: []
+                    }
+                }
         });
 
         test("should throw error and return null when axios fails", async()=>{
@@ -164,4 +169,5 @@ describe("Spotify service layer", () => {
         });
     });
     
+});
 });
