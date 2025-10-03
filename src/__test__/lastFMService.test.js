@@ -1,6 +1,10 @@
+const axios = require("axios");
 const { getTracksByGenre, getTracksByArtist } = require("../service/lastFMService.js");
+const { logger } = require("../util/logger.js");
 
-global.fetch = jest.fn();
+jest.mock("axios");
+
+jest.mock("../util/logger.js");
 
 const createMockTracksByGenre = () =>
     Array.from({ length: 50 }, (_, i) => ({
@@ -16,13 +20,17 @@ const createMockTracksByArtist = () =>
     }));
 
 describe("LastFM service layer", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
     describe("getTracksByGenre function", () => {
         test("Successfully returns a list of 50 tracks by genre", async () => {
             // Arrange
             const mockTracks = createMockTracksByGenre();
 
-            fetch.mockResolvedValueOnce({
-                json: () => Promise.resolve({ tracks: { track: mockTracks } })
+            axios.get.mockResolvedValueOnce({
+                data: { tracks: { track: mockTracks } }
             });
 
             // Act
@@ -46,26 +54,35 @@ describe("LastFM service layer", () => {
                 invalidKey: {}
             };
 
-            fetch.mockResolvedValueOnce({
-                json: () => Promise.resolve(mockTracks)
+            axios.get.mockResolvedValueOnce({
+                data: { mockTracks }
             });
 
             // Act
             const result = await getTracksByGenre("genre");
 
             // Assert
-            expect(result).toBe(null);
+            expect(result).toBeNull();
+            expect(logger.error).not.toHaveBeenCalled();
         });
 
         test("Handles API client error response", async () => {
             // Arrange
-            fetch.mockResolvedValueOnce(new Error("Client error"));
+            axios.get.mockRejectedValueOnce({
+                response: {
+                    status: 400,
+                    data: {
+                        error: "Client error."
+                    }
+                }
+            });
 
             // Act
             const result = await getTracksByGenre("genre");
 
             // Assert
-            expect(result).toBe(null);
+            expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -74,8 +91,8 @@ describe("LastFM service layer", () => {
             // Arrange
             const mockTracks = createMockTracksByArtist();
 
-            fetch.mockResolvedValueOnce({
-                json: () => Promise.resolve({ toptracks: { track: mockTracks } })
+            axios.get.mockResolvedValueOnce({
+                data: { toptracks: { track: mockTracks } }
             });
 
             // Act
@@ -97,26 +114,35 @@ describe("LastFM service layer", () => {
                 invalidKey: {}
             };
 
-            fetch.mockResolvedValueOnce({
-                json: () => Promise.resolve(mockTracks)
+            axios.get.mockResolvedValueOnce({
+                data: { mockTracks }
             });
 
             // Act
             const result = await getTracksByArtist("artist");
 
             // Assert
-            expect(result).toBe(null);
+            expect(result).toBeNull();
+            expect(logger.error).not.toHaveBeenCalled();
         });
 
         test("Handles API client error response", async () => {
             // Arrange
-            fetch.mockResolvedValueOnce(new Error("Client error"));
+            axios.get.mockRejectedValueOnce({
+                response: {
+                    status: 400,
+                    data: {
+                        error: "Client error."
+                    }
+                }
+            });
 
             // Act
             const result = await getTracksByArtist("genre");
 
             // Assert
-            expect(result).toBe(null);
+            expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalledTimes(1);
         });
     });
 });
