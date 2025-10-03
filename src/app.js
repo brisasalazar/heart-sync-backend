@@ -7,14 +7,14 @@ const {authenticateToken} = require("./util/jwt");
 
 // import the necessary functions from the user controller
 const userController = require("./controller/userController");
-const postController = require("./postController");
+const postController = require("./controller/postController");
 
 const PORT = 3000;
 
-function loggerMiddleware(req, res, next){
-    logger.info(`Incoming ${req.method} : ${req.url}`);
-    next();
-}
+// function loggerMiddleware(req, res, next){
+//     logger.info(`Incoming ${req.method} : ${req.url}`);
+//     next();
+// }
 
 app.use(bodyParser.json());
 app.use(express.json());
