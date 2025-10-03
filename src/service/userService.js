@@ -45,11 +45,29 @@ async function updateUserDescription(user_id, newDescription) {
             logger.info(`User description has been updated: ${JSON.stringify(data)}`);
             return data;
         } else {
-            logger.info(`Failed to update user description: ${JSON.stringify(user_id)}`);
+            logger.info(`Failed to update user description: ${JSON.stringify(user_id, newDescription)}`);
             return null;
         }
     } else {
         logger.info(`Failed to validate user or description: ${JSON.stringify(user_id, newDescription)}`);
+        return null;
+    }
+}
+
+async function updateUserPassword(user_id, oldPassword, newPassword) {
+    const saltRounds = 10;
+
+    if (await validateUpdateUserPassword(user_id, oldPassword, newPassword)) {
+        const data = await userRepository.updateUserFields(user_id, {"password": await bcrypt.hash(newPassword, saltRounds)});
+        if (data) {
+            logger.info(`User password has been updated: ${JSON.stringify(data)}`);
+            return data;
+        } else {
+            logger.info(`Failed to update user password: ${JSON.stringify(user_id, newPassword)}`);
+            return null;
+        }
+    } else {
+        logger.info(`Failed to validate new password change: ${JSON.stringify(user_id, newPassword)}`);
         return null;
     }
 }
@@ -105,6 +123,22 @@ async function getUserByUsername(username) {
     }
 }
 
+async function getUserByEmail(email) {
+    if (email) {
+        const data = await userRepository.getUserByEmail(email);
+        if(data) {
+            logger.info(`User found by email: ${JSON.stringify(data)}`);
+            return data;
+        } else {
+            logger.info(`User not found by email: ${email}`);
+            return null;
+        }
+    } else {
+        logger.info(`Invalid Email`);
+        return null;
+    }
+}
+
 // This is a helper function
 async function validateLogin(username, password) {
     if (!username || !password) {
@@ -123,14 +157,16 @@ async function validateLogin(username, password) {
 }
 
 async function validateUser(user) {
+    // add a check to get a user by their email
     const usernameCheck = await (getUserByUsername(user.username));
-    if (user && !usernameCheck) {
+    const emailCheck = await (getUserByEmail(user.email));
+    if (user && !usernameCheck && !emailCheck) {
         const usernameResult = user.username.length > 0;
         const passwordResult = user.password.length > 0;
 
         return (usernameResult && passwordResult && (usernameCheck === null));
-    } else if (user && usernameCheck) {
-        logger.info(`User already exists with that username`);
+    } else if (user && (usernameCheck || emailCheck)) {
+        logger.info(`User already exists with that username or email`);
         return false;
     } else {
         logger.info(`Invalid User Object`);
@@ -147,6 +183,20 @@ async function validateUpdateUserDescription(user_id, newDescription) {
     return (userCheck && newDescription.length > 0)
 }
 
+async function validateUpdateUserPassword(user_id, oldPassword, newPassword) {
+    if (!user_id || !oldPassword || !newPassword) {
+        logger.info(`Invalid Password Update Input`);
+        return null;
+    } else if (oldPassword == newPassword){
+        logger.info(`Cannot replace password with the same password`);
+        return null;
+    }
+
+    const userCheck = await getUserById(user_id);
+
+    return (userCheck && await bcrypt.compare(oldPassword, userCheck.password) && newPassword.length > 0)
+}
+
 async function validateUserDeletion(user_id, password) {
     if (!user_id || !password) {
         return null;
@@ -160,8 +210,6 @@ async function validateUserDeletion(user_id, password) {
         logger.info(`User Deletion Could Not Be Validated`);
         return false;
     }
-
-
 }
 
 // exports
@@ -169,7 +217,9 @@ module.exports = {
     postUser,
     validateLogin,
     getUserByUsername,
+    getUserByEmail,
     getUserById,
     updateUserDescription,
+    updateUserPassword,
     deleteUser,
 }

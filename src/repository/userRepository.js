@@ -119,9 +119,6 @@ async function deleteUser(user_id) {
     }
 }
 
-//deleteUser("USER#useraa30497e-5e04-4f07-a846-5335858760de");
-
-
 async function getUserByUsername(username) {
     // currently uses a SCAN command to get the user by their username
     // This will work for now, but it is not the most efficient way possible
@@ -135,8 +132,6 @@ async function getUserByUsername(username) {
     try{
         const data = await documentClient.send(command);
         logger.info(`SCAN command to database complete ${JSON.stringify(data)}`);
-        //console.log(data);
-        //console.log(data.Items[0]);
         return data.Items[0];
     } catch(error) {
         logger.error(error);
@@ -144,7 +139,23 @@ async function getUserByUsername(username) {
     }
 }
 
-//getUserByUsername("revature101");
+async function getUserByEmail(email) {
+    const command = new ScanCommand({
+        TableName,
+        FilterExpression: "#email = :email",
+        ExpressionAttributeNames: {"#email": "email"},
+        ExpressionAttributeValues: {":email": email}
+    }); 
+
+    try{
+        const data = await documentClient.send(command);
+        logger.info(`SCAN command to database complete ${JSON.stringify(data)}`);
+        return data.Items[0];
+    } catch(error) {
+        logger.error(error);
+        return null;
+    }
+}
 
 // This function uses a queryCommand to efficiently pull a user by their ID,
 // This function will be used with the login token to quickly pull up a user to edit
@@ -182,6 +193,7 @@ async function getUserbyUserId(user_id) {
 module.exports = {
     postUser,
     getUserByUsername,
+    getUserByEmail,
     getUserbyUserId,
     updateUserDescription,
     updateUserFields,

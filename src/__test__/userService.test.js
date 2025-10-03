@@ -58,6 +58,31 @@ describe("User Posting Suite", () => {
         expect(newUser).toBeNull();
     });
 
+    test("Cannot post a user if their email is already in use", async () => {
+        userRepository.getUserByUsername.mockReturnValue(null);
+        
+        userRepository.getUserByEmail.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        const dummyUser = {
+            username: 'revature101',
+            password: 'pass1',
+            email: 'example@revature.net'
+        }
+
+        const newUser = await userService.postUser(dummyUser);
+        expect(userRepository.getUserByUsername).toHaveBeenCalled();
+        expect(userRepository.getUserByEmail).toHaveBeenCalled();
+
+        expect(newUser).toBeNull();
+    })
+
     test("Cannot post a user with invalid credentials", async () => {
         userRepository.getUserByUsername.mockReturnValue(null);
 
@@ -220,6 +245,83 @@ describe("User Update Description Suite", () => {
 
         expect(updatedUser).toBeNull;
     })
+})
+
+describe("User Update Password Suite", () => {
+    beforeEach(() => {
+        userRepository.getUserbyUserId.mockReturnValue(null);
+        userRepository.updateUserFields.mockReturnValue(null);
+    })
+
+    test("Updating a user's password returns an object with a correct new password", async () => {
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        userRepository.updateUserFields.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$suYal5aFAB3XJQjT74fiUuDTYFpqcuC5xeHy2txwKake2izMm.EPO',
+            username: 'revature101',
+            description: "This is the new updated description",
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef"
+        const dummyOldPassword = "pass1";
+        const dummyNewPassword = "password1011$";
+
+        const updatedUser = await userService.updateUserPassword(dummyUserId, dummyOldPassword, dummyNewPassword);
+        expect(userRepository.updateUserFields).toHaveBeenCalled();
+        expect(updatedUser.password).toBe("$2b$10$suYal5aFAB3XJQjT74fiUuDTYFpqcuC5xeHy2txwKake2izMm.EPO");
+    })
+
+
+    test("Trying to update a user's password with an null password returns null", async () => {
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef"
+        const dummyOldPassword = "pass1";
+        const dummyNewPassword = null;
+
+        const updatedUser = await userService.updateUserPassword(dummyUserId, dummyOldPassword, dummyNewPassword);
+        expect(updatedUser).toBeNull();
+    })
+
+    test("Updating a user's password with the same password doesn't work", async () => {
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef"
+        const dummyOldPassword = "pass1";
+        const dummyNewPassword = "pass1";
+
+        const updatedUser = await userService.updateUserPassword(dummyUserId, dummyOldPassword, dummyNewPassword);
+        expect(updatedUser).toBeNull();
+    })
+
+    test("Giving the wrong current password returns null", async () => {
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef"
+        const dummyOldPassword = "passOne";
+        const dummyNewPassword = "password1011$";
+
+        const updatedUser = await userService.updateUserPassword(dummyUserId, dummyOldPassword, dummyNewPassword);
+        expect(updatedUser).toBeNull();
+    })
+
+    // test("", async () => {
+        
+    // })
 })
 
 describe("User Deletion Suite", () => {
