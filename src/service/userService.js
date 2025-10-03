@@ -36,6 +36,40 @@ async function postUser(user) {
     }
 }
 
+async function updateUserDescription(user_id, newDescription) {
+    if (await validateUpdateUserDescription(user_id, newDescription)) {
+        //const data = await userRepository.updateUserDescription(user_id, newDescription);
+        const data = await userRepository.updateUserFields(user_id, {"description": newDescription});
+
+        if (data) {
+            logger.info(`User description has been updated: ${JSON.stringify(data)}`);
+            return data;
+        } else {
+            logger.info(`Failed to update user description: ${JSON.stringify(user_id)}`);
+            return null;
+        }
+    } else {
+        logger.info(`Failed to validate user or description: ${JSON.stringify(user_id, newDescription)}`);
+        return null;
+    }
+}
+
+async function getUserById(user_id) {
+    if (user_id) {
+        const data = await userRepository.getUserbyUserId(user_id);
+        if (data) {
+            logger.info(`User found by User Id: ${JSON.stringify(data)}`);
+            return data;
+        } else {
+            logger.info(`No User found by User Id: ${user_id}`);
+            return null;
+        }
+    } else {
+        logger.info(`Invalid User ID`);
+        return null;
+    }
+}
+
 
 // This is a helper function
 async function validateLogin(username, password) {
@@ -84,10 +118,23 @@ async function validateUser(user) {
     }
 }
 
+async function validateUpdateUserDescription(user_id, newDescription) {
+    if (!user_id || !newDescription) {
+        return null;
+    }
+
+    const userCheck = await getUserById(user_id);
+    // could potentially cut down the possible description length to 500 characters.
+    return (userCheck && newDescription.length > 0);
+
+    
+}
 
 // exports
 module.exports = {
     postUser,
     validateLogin,
     getUserByUsername,
+    getUserById,
+    updateUserDescription
 }

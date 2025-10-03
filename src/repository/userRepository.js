@@ -1,7 +1,7 @@
 //imports 
 const {logger} = require("../util/logger");
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, PutCommand, ScanCommand, QueryCommand} = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, PutCommand, ScanCommand, QueryCommand, UpdateCommand} = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({region: "us-east-1"});
 const documentClient = DynamoDBDocumentClient.from(client);
@@ -25,6 +25,83 @@ async function postUser(user) {
         return null;
     }
 }
+
+async function updateUserDescription(user_id, newDescription) {
+    const command = new UpdateCommand({
+        TableName,
+        Key: {
+            PK: user_id,
+            SK: 'METADATA'
+        },
+        UpdateExpression: "set #description = :description",
+        ExpressionAttributeNames: {
+            "#description": "description"
+        },
+        ExpressionAttributeValues: {
+            ":description": newDescription
+        }
+    })
+
+    try {
+        const data = await documentClient.send(command);
+        logger.info(`UPDATE command to databse complete ${JSON.stringify(data)}`);
+        return data;
+    }catch(error){
+        logger.error(error);
+        return null;
+    }
+}
+
+// this would only allow you to update one field at a time
+//async function updateUserFields(user_id, fieldName, fieldValue) {
+async function updateUserFields(user_id, updateFields) {
+    
+    let UpdateExpression = 'SET ';
+    const ExpressionAttributeNames = {};
+    const ExpressionAttributeValues = {};
+    let updateExpressionParts = [];
+
+    for (const fieldName in updateFields) {
+        if (Object.hasOwnProperty.call(updateFields, fieldName)) {
+            const fieldAlias = `#${fieldName}`;
+            const valueAlias = `:${fieldName}`;
+
+            updateExpressionParts.push(`${fieldAlias} = ${valueAlias}`);
+            ExpressionAttributeNames[fieldAlias] = fieldName;
+            ExpressionAttributeValues[valueAlias] = updateFields[fieldName];
+        }
+    }
+
+    UpdateExpression += updateExpressionParts.join(', ');
+
+    const command = new UpdateCommand({
+        TableName,
+        Key: {
+            PK: user_id,
+            SK: 'METADATA'
+        },
+        //UpdateExpression: `set #${fieldName} = :${fieldName}`,
+        UpdateExpression: UpdateExpression,
+
+        ExpressionAttributeNames: ExpressionAttributeNames,
+        ExpressionAttributeValues: ExpressionAttributeValues,
+    })
+
+    try {
+        const data = await documentClient.send(command);
+        logger.info(`UPDATE command to databse complete ${JSON.stringify(data)}`);
+        return data;
+    }catch(error){
+        logger.error(error);
+        return null;
+    }
+}
+
+// async function updateUserDescriptionTest(user_id, newDescription) {
+//     console.log(await updateUserDescription(user_id, newDescription));
+// }
+
+// updateUserDescriptionTest("USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef", "Hey Everyone, this is my new description!");
 
 
 async function getUserByUsername(username) {
@@ -51,16 +128,42 @@ async function getUserByUsername(username) {
 
 //getUserByUsername("revature101");
 
-// async function getUserbyUserId(user_id) {
-//     const params = {
-//         TableName,
-//         KeyConditionExpression:
-//     }
-// }
+// This function uses a queryCommand to efficiently pull a user by their ID,
+// This function will be used with the login token to quickly pull up a user to edit
+async function getUserbyUserId(user_id) {
+    const command = new QueryCommand({
+        TableName,
+        // pulls user directly by their primary key and sorting key without having to use a SCAN command
+        KeyConditionExpression: "#PK = :pkValue and #SK = :skValue",
+        ExpressionAttributeNames: {
+            "#PK": "PK",
+            "#SK": "SK"
+        },
+        ExpressionAttributeValues: {
+            ':pkValue': user_id,
+            ':skValue': 'METADATA'
+        }
+    })
+
+    try{
+        const data = await documentClient.send(command);
+        logger.info(`Query command to database complete ${JSON.stringify(data)}`);
+        return data.Items[0];
+    } catch(error) {
+        logger.error(error);
+        return null;
+    }
+}
+
+
+
 
 
 //exports
 module.exports = {
     postUser,
     getUserByUsername,
+    getUserbyUserId,
+    updateUserDescription,
+    updateUserFields,
 }
