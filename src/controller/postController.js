@@ -5,14 +5,15 @@ const postService = require("../service/postService");
 const {authenticateToken} = require("../util/jwt");
 const { logger } = require("../util/logger");
 
-//get feed for current user
+//get feed for current user - TODO needs tweaking, set header 
 router.get("/feed", authenticateToken, async(req, res) =>{
     const user = req.user;
-    const data = await postService.getUserFeed(user.PK);
+    console.log(user);
+    const data = await postService.getUserFeed(user.id);
     if (data){
-        res.status(200).json({message: `User feed`, data: data.Items});
+        res.status(200).json({message: `User feed for ${user.username}`, data: data});
     } else {
-        res.status(400).json({message: `Unable to retrieve feed. Try again.`, data:req.body});
+        res.status(400).json({message: `Unable to retrieve feed for ${user.username}. Try again.`});
     }
 })
 

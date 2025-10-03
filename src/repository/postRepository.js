@@ -24,23 +24,6 @@ const documentClient = DynamoDBDocumentClient.from(client);
 
 const TableName = "heart-sync"; // update tabel name with personal table name
 
-// get user feed (posts from following by chronological order)
-async function getUserFeed(userID){
-    const command = new QueryCommand({
-        TableName,
-        KeyConditionExpression: "PK = :userID AND begins_with(SK, :sk)",
-        ExpressionAttributeValues: {":userID" : `USER#${userID}`, ":sk" : "POST#"}
-    })
-    try{
-        const data = await documentClient.send(command);
-        logger.info("GET command successful.");
-        return data;
-    } catch(err){
-        logger.error(err);
-        return null;
-    }
-}
-
 // get all posts by user 
 async function getPostsFromUser(userID){
     const command = new QueryCommand({
@@ -78,6 +61,7 @@ async function getPostByID(userID, postID){
 
 // create a post 
 async function putPost(postInfo){
+   // const timestamp = new Date().now();
     const command = new PutCommand({
         TableName, 
         Item:{
@@ -88,7 +72,7 @@ async function putPost(postInfo){
             pst_activityType: postInfo.pst_activityType,
             playlist_spotifyURI: postInfo.playlist_spotifyURI,
             pst_media: postInfo.pst_media,
-            pst_timestamp: new Date.now()
+            pst_timestamp: Date.now()
         }
     })
     try{

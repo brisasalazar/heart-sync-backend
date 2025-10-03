@@ -2,6 +2,7 @@
 const {logger} = require("../util/logger");
 const postRepository = require("../repository/postRepository");
 const userService = require("../service/userService");
+const { ContinuousBackupsUnavailableException } = require("@aws-sdk/client-dynamodb");
 
 // ensure post has neccessary attributes (
 // playlist link 
@@ -12,6 +13,22 @@ function validatePost(postInfo){
     const playlistLink = postInfo.playlist_spotifyURI;
     const activityType = postInfo.pst_activityType;
     return playlistLink && activityType;   
+}
+
+// get a user's feed/timeline 
+async function getUserFeed(userID){
+    const user = await userService.getUserById(userID);
+    const followingList = user.usr_following;
+    const feed = []
+    for (var user_id of followingList){
+        const data = await postRepository.getPostsFromUser(user_id);
+        if(data){
+            for (var post of data.Items){
+                feed.push(post);
+            }
+        }
+    }
+    return feed.sort().reverse();
 }
 
 // get all posts from specific user 
@@ -64,4 +81,4 @@ async function deletePost(username, postID){
     }
 }
 
-module.exports = {createPost, deletePost, getPostsFromUser};
+module.exports = {getUserFeed, createPost, deletePost, getPostsFromUser};
