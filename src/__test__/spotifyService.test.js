@@ -1,7 +1,7 @@
 const axios = require("axios");
-const { getUser, getPlaylists, getTrackURI, getTokenInfo, refreshToken } = require("../service/spotifyService.js");
+const { getUser, getPlaylists, getTrackURI, getTokenInfo, refreshToken, addTracksToPlaylist } = require("../service/spotifyService.js");
 const { getAuthHeaders } = require("../util/auth.js");
-const {logger} = require("../util/logger.js")
+const { logger } = require("../util/logger.js")
 
 // Mock getAuthHeaders()
 jest.mock("../util/auth.js", () => ({
@@ -34,8 +34,8 @@ describe("Spotify service layer", () => {
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
         });
-      
-        test("returns nulls when error occurs", async()=>{
+
+        test("returns nulls when error occurs", async () => {
             axios.get.mockRejectedValue(new Error("error"));
 
             const result = await getUser();
@@ -76,8 +76,8 @@ describe("Spotify service layer", () => {
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
         });
-      
-         test("should throw error if axios fails", async()=>{
+
+        test("should throw error if axios fails", async () => {
             axios.get.mockRejectedValue(new Error("error"));
 
             const result = await getUser();
@@ -113,12 +113,12 @@ describe("Spotify service layer", () => {
             expect(axios.get).toHaveBeenCalledTimes(1);
             expect(getAuthHeaders).toHaveBeenCalledTimes(1);
         });
-      
-        test("should return null when no tracks returned", async() =>{
+
+        test("should return null when no tracks returned", async () => {
             // Brisa will finish this up 
         });
 
-        test("should throw error and return null when axios fails", async()=>{
+        test("should throw error and return null when axios fails", async () => {
             // brisa will finsih this up
         });
     });
@@ -145,7 +145,7 @@ describe("Spotify service layer", () => {
             expect(axios.post).toHaveBeenCalledTimes(1);
         });
 
-        test("should return null with invalid input params", async()=>{
+        test("should return null with invalid input params", async () => {
             axios.get.mockResolvedValue(null);
 
             const result = await getTokenInfo(null);
@@ -154,8 +154,8 @@ describe("Spotify service layer", () => {
         });
     });
 
-     describe("refreshToken()",()=>{
-        test("should return null with invalid input params", async()=>{
+    describe("refreshToken()", () => {
+        test("should return null with invalid input params", async () => {
             axios.get.mockResolvedValue(null);
 
             const result = await refreshToken(null);
@@ -163,5 +163,100 @@ describe("Spotify service layer", () => {
             expect(result).toBeNull();
         });
     });
-    
+
+    describe("addTracksToPlaylist function", () => {
+        test("Successfully returns a list of Spotify URIs", async () => {
+            // Arrange
+            const mockPlaylistId = "playlistId";
+            const mockTrackURIs = [
+                "spotifyURI 1",
+                "spotifyURI 2"
+            ];
+
+            axios.post.mockResolvedValueOnce({
+                data: mockTrackURIs
+            });
+
+            // Act
+            const result = await addTracksToPlaylist(mockPlaylistId, mockTrackURIs);
+
+            // Assert
+            expect(result).toBe(mockTrackURIs);
+            expect(axios.post).toHaveBeenCalledTimes(1);
+        });
+
+        test("Successfully returns an empty list when Spotify URI list is empty", async () => {
+            // Arrange
+            const mockPlaylistId = "playlistId";
+            const mockTrackURIs = [];
+
+            axios.post.mockResolvedValueOnce({
+                data: mockTrackURIs
+            });
+
+            // Act
+            const result = await addTracksToPlaylist(mockPlaylistId, mockTrackURIs);
+
+            // Assert
+            expect(result).toBe(mockTrackURIs);
+            expect(result).toHaveLength(0);
+
+            expect(axios.post).toHaveBeenCalledTimes(1);
+            expect(logger.error).not.toHaveBeenCalled();
+        });
+
+        test("Returns null when playlist ID is not provided", async () => {
+            // Arrange
+            const mockPlaylistId = "";
+            const mockTrackURIs = [
+                "spotifyURI 1",
+                "spotifyURI 2"
+            ];
+
+            axios.post.mockRejectedValueOnce({
+                response: {
+                    status: 400,
+                    data: {
+                        error: "Invalid playlist ID."
+                    }
+                }
+            });
+
+            // Act
+            const result = await addTracksToPlaylist(mockPlaylistId, mockTrackURIs);
+
+            // Assert
+            expect(result).toBeNull();
+
+            expect(axios.post).toHaveBeenCalledTimes(1);
+            expect(logger.error).toHaveBeenCalledTimes(1);
+        });
+
+        test("Returns null when authorization token is expired", async () => {
+            // Arrange
+            const mockPlaylistId = "playlistId";
+            const mockTrackURIs = [
+                "spotifyURI 1",
+                "spotifyURI 2"
+            ];
+
+            axios.post.mockRejectedValueOnce({
+                response: {
+                    status: 401,
+                    data: {
+                        error: "Expired token."
+                    }
+                }
+            });
+
+            // Act
+            const result = await addTracksToPlaylist(mockPlaylistId, mockTrackURIs);
+
+            // Assert
+            expect(result).toBeNull();
+
+            expect(axios.post).toHaveBeenCalledTimes(1);
+            expect(logger.error).toHaveBeenCalledTimes(1);
+        });
+    });
 });
