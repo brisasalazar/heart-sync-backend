@@ -72,6 +72,37 @@ async function updateUserPassword(user_id, oldPassword, newPassword) {
     }
 }
 
+async function addFollowingUser(user_id, followingId) {
+    if (await validateAddFollowingUser(user_id, followingId)) {
+        // check to see if the following list exists
+        const currentUser = await getUserById(user_id);
+
+        
+        
+        let followingList = currentUser?.following;
+        console.log(followingList);
+
+        if (followingList) {
+            followingList.add(followingId);
+        } else {
+            followingList = new Set([followingId]);
+        }
+
+        const data = await userRepository.updateUserFields(user_id, {"following": followingList});
+        if (data) {
+            logger.info(`User following list has been updated: ${JSON.stringify(data)}`);
+            return data;
+        } else {
+            logger.info(`Failed to update user following list: ${JSON.stringify(user_id, followingId)}`);
+            return null;
+        }
+
+    } else {
+        logger.info(`Failed to validate new folloing list change: ${JSON.stringify(user_id, followingId)}`);
+        return null;
+    }
+}
+
 async function deleteUser(user_id, password) {
     if (await validateUserDeletion(user_id, password)) {
 
@@ -197,6 +228,29 @@ async function validateUpdateUserPassword(user_id, oldPassword, newPassword) {
     return (userCheck && await bcrypt.compare(oldPassword, userCheck.password) && newPassword.length > 0)
 }
 
+async function validateAddFollowingUser(user_id, followingId) {
+    if (!user_id || !followingId || user_id == followingId) {
+        logger.info(`Invalid Following List Update Input`);
+        return null;
+    }
+    const userCheck = await getUserById(user_id);
+    const followingCheck = await getUserById(followingId);
+
+    if (!userCheck || !followingCheck) {
+        logger.info(`Non-existant User`);
+        return null;
+    }
+
+    let userFollowList = userCheck?.following;
+
+    if (userFollowList && userFollowList.has(followingId)) {
+        logger.info(`Following List Already Has New Following ID`);
+        return null
+    }
+
+    return true;
+}
+
 async function validateUserDeletion(user_id, password) {
     if (!user_id || !password) {
         return null;
@@ -221,5 +275,6 @@ module.exports = {
     getUserById,
     updateUserDescription,
     updateUserPassword,
+    addFollowingUser,
     deleteUser,
 }

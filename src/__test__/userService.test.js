@@ -318,10 +318,84 @@ describe("User Update Password Suite", () => {
         const updatedUser = await userService.updateUserPassword(dummyUserId, dummyOldPassword, dummyNewPassword);
         expect(updatedUser).toBeNull();
     })
+})
 
-    // test("", async () => {
+describe("User Add Follower Suite", () => {
+    beforeEach(() => {
+        userRepository.getUserbyUserId.mockReturnValue(null);
+        userRepository.updateUserFields.mockReturnValue(null);
+    })
+    test("Adding a follower should be reflected in the user object", async () => {
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:new Set (['user5dbd0e3b-6718-46ca-9867-f2df7765fea5']),
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
         
-    // })
+        userRepository.updateUserFields.mockReturnValue({
+            following:new Set (['user5dbd0e3b-6718-46ca-9867-f2df7765fea5', 'USER#userd712e462-8aa9-4a3d-9251-461c679e78dc']),
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            description: "This is the new updated description",
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+        const followingId = "USER#userd712e462-8aa9-4a3d-9251-461c679e78dc";
+
+        const updatedUser = await userService.addFollowingUser(dummyUserId, followingId);
+        expect(userRepository.getUserbyUserId).toHaveBeenCalled();
+        expect(userRepository.updateUserFields).toHaveBeenCalled();
+        expect(updatedUser.following).toContain(followingId);
+    })
+
+    test("Cannot add a follower using a null followingId", async () => {
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+        const followingId = null;
+
+        const updatedUser = await userService.addFollowingUser(dummyUserId, followingId);
+        expect(updatedUser).toBeNull;
+    })
+
+    test("Cannot add a follower using a followingId that doesn't exist", async () => {
+        userRepository.getUserbyUserId.mockReturnValue(null);
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+        const followingId = "USER#userd712e462-8aa######9-4a3d-9251-461c679e78dc";
+
+        const updatedUser = await userService.addFollowingUser(dummyUserId, followingId);
+        expect(updatedUser).toBeNull;
+    })
+
+    test("Cannot add a follower using your own user_id", async () => {
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+        const followingId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+
+        const updatedUser = await userService.addFollowingUser(dummyUserId, followingId);
+        expect(updatedUser).toBeNull;
+    })
+
+    test("Cannot add a follower that is already in your following list", async () => {
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:new Set (['user5dbd0e3b-6718-46ca-9867-f2df7765fea5']),
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+        const followingId = "user5dbd0e3b-6718-46ca-9867-f2df7765fea5";
+
+        const updatedUser = await userService.addFollowingUser(dummyUserId, followingId);
+        expect(updatedUser).toBeNull;
+    })
+    
 })
 
 describe("User Deletion Suite", () => {
