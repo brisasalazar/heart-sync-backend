@@ -63,9 +63,22 @@ router.put("/description", validateLoginStatus, async (req, res) => {
 
     const data = await userService.updateUserDescription(localTranslatedToken.id, description);
     if (data) {
-        res.status(201).json({message: "User has been updated successfully", data: data});
+        res.status(201).json({message: "User description has been updated successfully", data: data});
     } else {
-        res.status(400).json({message: "failed to update user", data: req.body});
+        res.status(400).json({message: "failed to update user description", data: req.body});
+    }
+})
+
+router.put("/password", validateLoginStatus, async (req, res) => {
+    const {oldPassword, newPassword} = req.body;
+
+    const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
+
+    const data = await userService.updateUserPassword(localTranslatedToken.id, oldPassword, newPassword);
+    if (data) {
+        res.status(201).json({message: "User password has been updated successfully", data: data});
+    } else {
+        res.status(400).json({message: "failed to update user password", data: req.body});
     }
 })
 
