@@ -1,6 +1,7 @@
 const userRepository = require("../repository/userRepository");
 const bcrypt = require('bcrypt');
 const {logger} = require("../util/logger");
+const e = require("express");
 
 
 // logic
@@ -76,7 +77,7 @@ async function addFollowingUser(user_id, followingId) {
     if (await validateAddFollowingUser(user_id, followingId)) {
         // check to see if the following list exists
         const currentUser = await getUserById(user_id);
-
+        
         
         
         let followingList = currentUser?.following;
@@ -91,9 +92,28 @@ async function addFollowingUser(user_id, followingId) {
         const data = await userRepository.updateUserFields(user_id, {"following": followingList});
         if (data) {
             logger.info(`User following list has been updated: ${JSON.stringify(data)}`);
-            return data;
+            //return data;
         } else {
             logger.info(`Failed to update user following list: ${JSON.stringify(user_id, followingId)}`);
+            return null;
+        }
+
+        // add yourself to the "followers" list of the user you just followed
+        const followedUser = await getUserById(followingId);
+        let followersList = followedUser?.followers;
+
+        if (followersList) {
+            followersList.add(user_id);
+        } else {
+            followersList = new Set([user_id]);
+        }
+
+        const followersData = await userRepository.updateUserFields(followingId, {"followers": followersList});
+        if (followersData) {
+            logger.info(`User followers list has been updated: ${JSON.stringify(followersData)}`)
+            return data;
+        } else {
+            logger.info(`Failed to update user followers list: ${JSON.stringify(user_id, followingId)}`)
             return null;
         }
 
