@@ -29,7 +29,7 @@ async function getPostsFromUser(userID){
     const command = new QueryCommand({
         TableName,
         KeyConditionExpression: "PK = :userID AND begins_with(SK, :sk)",
-        ExpressionAttributeValues: {":userID" : `USER#${userID}`, ":sk" : "POST#"}
+        ExpressionAttributeValues: {":userID" : userID, ":sk" : "POST#"}
     })
     try{
         const data = await documentClient.send(command);
@@ -70,7 +70,8 @@ async function putPost(postInfo){
             pst_caption: postInfo.pst_caption,
             pst_activityType: postInfo.pst_activityType,
             playlist_spotifyURI: postInfo.playlist_spotifyURI,
-            pst_media: postInfo.pst_media
+            pst_media: postInfo.pst_media,
+            pst_timestamp: postInfo.pst_timestamp
         }
     })
     try{
@@ -85,22 +86,20 @@ async function putPost(postInfo){
 
 // delete post
 async function deletePost(userID, postID){
-    try{
-        const command = new DeleteCommand({
+     const command = new DeleteCommand({
             TableName, 
             Key: {
                 PK: userID,
-                SK: `POST#${postID}`
+                SK: postID
             }
         });
-        try{
-            const data = await documentClient.send(command);
-            logger.info(`DELETE command successful.`, data);
-            return data;
-        } catch (err){
-            logger.error(err);
-            return null;
-        }
+    
+    try{    
+        const data = await documentClient.send(command);
+
+        logger.info(`DELETE command successful.`, data);
+        return data;
+
     } catch (err){
         logger.error(`Post not found.`);
         return null;

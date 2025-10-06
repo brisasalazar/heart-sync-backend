@@ -59,14 +59,14 @@ async function getPostsFromUser(userID){
 }
 
 //create post
-async function createPost(username, postInfo){
+async function createPost(userID, postInfo){
     try{
-        const user = await userService.getUserByUsername(username);
+        const user = await userService.getUserById(userID);
         if (validatePost(postInfo)){
             const data = await postRepository.putPost({
                 PK: user.PK,
                 SK: crypto.randomUUID(),
-                username: username,
+                username: user.username,
                 playlist_spotifyURI: postInfo.playlist_spotifyURI,
                 pst_caption: postInfo.pst_caption,
                 pst_timestamp: Date.now(),
@@ -84,23 +84,26 @@ async function createPost(username, postInfo){
             return null;
         }
     } catch(err){
-        logger.error(err);
+        logger.error("error", err);
         return null;
     }
     
 }
 
 // delete post
-async function deletePost(username, postID){
+async function deletePost(userID, postID){
     try{
-        const user = await userService.getUserByUsername(username);
-        const data = await postRepository.deletePost(user.PK, postID);
-        if (data){
-            logger.info(`Successfully deleted post`, data);
-            return data;
-        } else {
-            logger.error(`Unable to delete post`, data);
-            return null;
+        const post = await postRepository.getPostByID(postID);
+        console.log(post.Items);
+        if (post.Items == []){
+            const data = await postRepository.deletePost(userID, postID);
+            if (data){
+                logger.info(`Successfully deleted post`, data);
+                return data;
+            } else {
+                logger.error(`Unable to delete post`, data);
+                return null;
+            }
         }
     } catch (err){
         logger.error(err);
