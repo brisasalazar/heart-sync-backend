@@ -78,8 +78,6 @@ async function addFollowingUser(user_id, followingId) {
         // check to see if the following list exists
         const currentUser = await getUserById(user_id);
         
-        
-        
         let followingList = currentUser?.following;
         console.log(followingList);
 
@@ -108,6 +106,8 @@ async function addFollowingUser(user_id, followingId) {
             followersList = new Set([user_id]);
         }
 
+        // this currently works but it is very sloppy
+        // it might be cumbersome but I will probably have to implement a separate API call for this functionality.
         const followersData = await userRepository.updateUserFields(followingId, {"followers": followersList});
         if (followersData) {
             logger.info(`User followers list has been updated: ${JSON.stringify(followersData)}`)
@@ -118,7 +118,33 @@ async function addFollowingUser(user_id, followingId) {
         }
 
     } else {
-        logger.info(`Failed to validate new folloing list change: ${JSON.stringify(user_id, followingId)}`);
+        logger.info(`Failed to validate new following list change: ${JSON.stringify(user_id, followingId)}`);
+        return null;
+    }
+}
+
+// Not in use
+async function addUserToFollowersList(user_id, followingId) {
+    if (await validateAddUserToFollowersList(user_id, followingId)) {
+        const followedUser = await getUserById(followingId);
+        let followersList = followedUser?.followers;
+
+        if (followersList) {
+            followersList.add(user_id);
+        } else {
+            followersList = new Set([user_id]);
+        }
+
+        const data = await userRepository.updateUserFields(followingId, {"followers": followersList});
+        if (data) {
+            logger.info(`User followers list has been updated: ${JSON.stringify(data)}`)
+            return data;
+        } else {
+            logger.info(`Failed to update user followers list: ${JSON.stringify(user_id, followingId)}`)
+            return null;
+        }
+    } else {
+        logger.info(`Failed to validate new followers list change: ${JSON.stringify(user_id, followingId)}`);
         return null;
     }
 }
@@ -271,6 +297,34 @@ async function validateAddFollowingUser(user_id, followingId) {
     return true;
 }
 
+// not in use
+async function validateAddUserToFollowersList(user_id, followingId) {
+    if (!user_id || !followingId || user_id == followingId) {
+        logger.info(`Invalid Followers List Update Input`);
+        return null;
+    }
+
+    const userCheck = await getUserById(user_id);
+    const followingCheck = await getUserById(followingId);
+
+    // Because a set cannot contain duplicates we don't need to check wether or not the 
+    // other user's "followers" list contains the user_id
+
+    if (!userCheck || !followingCheck) {
+        logger.info(`Non-existant User`);
+        return null;
+    }
+
+    let targetFollowersList = followingCheck?.followers;
+    
+    if (targetFollowersList && targetFollowersList.has(user_id)) {
+        logger.info(`Followers List already contains User's ID`);
+        return null;
+    }
+    
+    return true;
+}
+
 async function validateUserDeletion(user_id, password) {
     if (!user_id || !password) {
         return null;
@@ -296,5 +350,6 @@ module.exports = {
     updateUserDescription,
     updateUserPassword,
     addFollowingUser,
+    addUserToFollowersList,
     deleteUser,
 }
