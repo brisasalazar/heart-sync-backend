@@ -95,6 +95,19 @@ router.put("/following", validateLoginStatus, async (req, res) => {
     }
 })
 
+// router.put("/followers", validateLoginStatus, async (req, res) => {
+//     const {followingId} = req.body;
+
+//     const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
+
+//     const data = await userService.addUserToFollowersList(localTranslatedToken.id, followingId);
+//     if (data) {
+//         res.status(201).json({message: "Target followers list has been updated successfully", data: data});
+//     } else {
+//         res.status(400).json({message: "failed to update target followers list", data: req.body});
+//     }
+// })
+
 router.delete("/", validateLoginStatus, async (req, res) => {
     const {password} = req.body;
 
