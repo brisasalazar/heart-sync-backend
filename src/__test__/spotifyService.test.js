@@ -115,12 +115,35 @@ describe("Spotify service layer", () => {
         });
 
         test("should return null when no tracks returned", async () => {
-            // Brisa will finish this up 
+            const mockArtist = "artist";
+            const mockTrack = "track";
+
+            axios.get.mockResolvedValueOnce({
+                data: {
+                    tracks: {
+                        items: []
+                    }
+                }
+            });
+
+            const result = await getTrackURI(mockArtist, mockTrack);
+            
+            expect(result).toBeNull();
+            expect(axios.get).toHaveBeenCalled();
         });
 
         test("should throw error and return null when axios fails", async () => {
-            // brisa will finsih this up
+            const mockArtist = "artist";
+            const mockTrack = "track";
+
+            axios.get.mockRejectedValue(new Error);
+
+            const result = await getTrackURI(mockArtist, mockTrack);
+
+            expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalledWith(new Error);
         });
+
     });
 
     describe("getTokenInfo function", () => {
@@ -145,23 +168,59 @@ describe("Spotify service layer", () => {
             expect(axios.post).toHaveBeenCalledTimes(1);
         });
 
-        test("should return null with invalid input params", async () => {
-            axios.get.mockResolvedValue(null);
+        test("should return null and throw error with invalid input params", async () => {
+            const mockCode = "code";
 
-            const result = await getTokenInfo(null);
+            axios.post.mockRejectedValue(new Error);
+
+            const result = await getTokenInfo(mockCode);
 
             expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalledWith(new Error);
         });
     });
 
     describe("refreshToken()", () => {
-        test("should return null with invalid input params", async () => {
-            axios.get.mockResolvedValue(null);
+        test("should return new token data when refresh is successful", async () => {
+            const mockSession = {
+                refreshToken: "refreshToken"
+            };
+            const mockTokenInfo = {
+                access_token: "accessToken",
+                expires_in: 30,
+                token_type: "Bearer"
+            };
+            axios.post.mockResolvedValue({data: mockTokenInfo});
+
+            const result = await refreshToken(mockSession);
+
+            expect(axios.post).toHaveBeenCalled();
+            expect(result).toEqual(mockTokenInfo);
+        });
+
+        test("should return null and log error when refresh fails", async () => {
+            const mockSession = {
+                refreshToken: "invalid-refresh-token"
+            };
+            const mockError = new Error("Invalid refresh token");
+            axios.post.mockRejectedValue(mockError);
+
+            const result = await refreshToken(mockSession);
+
+            expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalledWith(mockError);
+        });
+
+        test("should return null and catch error when null session parameter", async () => {
+            const mockError = new TypeError("Cannot read properties of null (reading 'refreshToken')");
+            axios.post.mockRejectedValue(mockError);
 
             const result = await refreshToken(null);
 
             expect(result).toBeNull();
+            expect(logger.error).toHaveBeenCalledWith(mockError);
         });
+     
     });
 
     describe("addTracksToPlaylist function", () => {
