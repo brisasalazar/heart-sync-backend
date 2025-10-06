@@ -3,7 +3,7 @@ const {logger} = require("../util/logger");
 const postRepository = require("../repository/postRepository");
 const userService = require("../service/userService");
 
-// ensure post has neccessary attributes (
+// ensure post has neccessary attributes 
 // playlist link 
 // acitivty type
 // caption optional 
