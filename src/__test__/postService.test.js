@@ -76,13 +76,13 @@ describe("Post Service Tests", () => {
         test("should create post successfully with valid data", async () => {
             const mockCreatedPost = { PK: "USER#123", SK: "POST#456" };
 
-            userService.getUserByUsername.mockResolvedValue(mockUser);
+            userService.getUserById.mockResolvedValue(mockUser);
             postRepository.putPost.mockResolvedValue(mockCreatedPost);
 
-            const result = await postService.createPost(mockUser.username, validPostInfo);
+            const result = await postService.createPost(mockUser.PK, validPostInfo);
             await postService.validatePost(validPostInfo);
             
-            expect(userService.getUserByUsername).toHaveBeenCalled();
+            expect(userService.getUserById).toHaveBeenCalled();
             expect(spyValidatePost).toHaveBeenCalledTimes(1);
             expect(postRepository.putPost).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -98,31 +98,34 @@ describe("Post Service Tests", () => {
         });
 
         test("should return null when post creation fails", async () => {
-            userService.getUserByUsername.mockResolvedValue(mockUser);
+            userService.getUserById.mockResolvedValue(mockUser);
             postRepository.putPost.mockResolvedValue(null);
 
-            const result = await postService.createPost("someUser", validPostInfo);
+            const result = await postService.createPost(mockUser.PK, validPostInfo);
 
             expect(result).toBeNull();
+            expect(userService.getUserById).toHaveBeenCalled();
         });
 
         test("should return null if unable to validate data", async()=>{
-            userService.getUserByUsername.mockResolvedValue(mockUser);
+            userService.getUserById.mockResolvedValue(mockUser);
            
-            const result = await postService.createPost(mockUser.username, invalidPostInfo);
+            const result = await postService.createPost(mockUser.PK, invalidPostInfo);
             await postService.validatePost(invalidPostInfo);
 
             expect(result).toBeNull();
+            expect(userService.getUserById).toHaveBeenCalled();
             expect(spyValidatePost).toHaveBeenCalledTimes(1);
             expect(spyValidatePost).toHaveBeenCalledWith(invalidPostInfo);
             expect(logger.error).toHaveBeenCalledWith(`Missing fields.`);
         });
 
-         test("should return null and catch error if unable to retrieve username", async()=>{
-            userService.getUserByUsername.mockRejectedValue(new Error);
+         test("should return null and catch error if unable to retrieve user", async()=>{
+            userService.getUserById.mockRejectedValue(new Error);
 
-            const result = await postService.createPost(mockUser.username, invalidPostInfo);
+            const result = await postService.createPost(mockUser.PK, invalidPostInfo);
 
+            expect(userService.getUserById).toHaveBeenCalled();
             expect(logger.error).toHaveBeenCalledWith(new Error);
             expect(result).toBeNull();
         });
@@ -130,31 +133,37 @@ describe("Post Service Tests", () => {
 
     describe("deletePost()", ()=>{
         const mockUser = { PK: "USER#123", username: "user" };
+        const mockPost = {PK: "USER#123", SK: "POST#456"};
         
         test("should return null when post deletion fails", async() =>{
-            userService.getUserByUsername.mockResolvedValue(mockUser)
+            postRepository.getPostByID.mockResolvedValue(mockPost);
             postRepository.deletePost.mockResolvedValue(null);
 
-            const result = await postService.deletePost(mockUser.username, "456");
+            const result = await postService.deletePost(mockUser.PK, mockPost.SK);
 
             expect(result).toBeNull();
             expect(logger.error).toHaveBeenCalledWith(`Unable to delete post`, null);
+            expect(postRepository.getPostByID).toHaveBeenCalled();
+            expect(postRepository.deletePost).toHaveBeenCalled();
         });
         
          test("should delete post successfully with valid data", async() =>{
             const mockDeletedPost = {PK: "USER#123", SK: "POST#456"};
-            userService.getUserByUsername.mockResolvedValue(mockUser);
+            postRepository.getPostByID.mockResolvedValue(mockDeletedPost);
             postRepository.deletePost.mockResolvedValue(mockDeletedPost);
 
             const result = await postService.deletePost(mockUser.PK, "456");
 
             expect(result).toEqual(mockDeletedPost);
+            expect(logger.info).toHaveBeenCalledWith(`Successfully deleted post`, mockDeletedPost);
+            expect(postRepository.getPostByID).toHaveBeenCalled();
+            expect(postRepository.deletePost).toHaveBeenCalled();
         });
 
-        test("should return null and throw error when fail to get username", async()=>{
-            userService.getUserByUsername.mockRejectedValue(new Error);
+        test("should return null and throw error when fail to get post by id", async()=>{
+            postRepository.getPostByID.mockRejectedValue(new Error);
 
-            const result = await postService.deletePost(mockUser.username, "456");
+            const result = await postService.deletePost(mockUser.PK, "456");
 
             expect(logger.error).toHaveBeenCalledWith(new Error);
             expect(result).toBeNull();

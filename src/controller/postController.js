@@ -2,13 +2,14 @@
 const express = require("express");
 const router = express.Router();
 const postService = require("../service/postService");
-const {authenticateToken} = require("../util/jwt");
+const userService = require("../service/userService");
+const {authenticateToken, decodeJWT} = require("../util/jwt");
 const { logger } = require("../util/logger");
+
 
 //get feed for current user  
 router.get("/feed", authenticateToken, async(req, res) =>{
     const user = req.user;
-    console.log(user);
     const data = await postService.getUserFeed(user.id);
     if (data){
         res.status(200).json({message: `User feed for ${user.username}`, data: data});
@@ -18,7 +19,7 @@ router.get("/feed", authenticateToken, async(req, res) =>{
 })
 
 //get posts from certain user 
-router.get("/post-history", authenticateToken, async(req, res) =>{
+router.get("/post-history", authenticateToken, authorizedViewer, async(req, res) =>{
     const {userID} = req.query;
     const data = await postService.getPostsFromUser(userID);
     if (data){
@@ -31,7 +32,8 @@ router.get("/post-history", authenticateToken, async(req, res) =>{
 // create post
 router.post("/", authenticateToken, async(req, res) => {
     const currUser = req.user;
-    const data = await postService.createPost(currUser.username, req.body);
+    console.log(currUser);
+    const data = await postService.createPost(currUser.id, req.body);
      if (data){
         res.status(201).json({message: `Post created successfully.`, data:data});
     } else {
@@ -43,7 +45,7 @@ router.post("/", authenticateToken, async(req, res) => {
 router.delete("/", authenticateToken, async(req, res) =>{
     const {postID} = req.query;
     const currUser = req.user;
-    const data = await postService.deletePost(currUser.username, postID);
+    const data = await postService.deletePost(currUser.id, postID);
      if (data){
         res.status(200).json({message: `Post deleted successfully.`});
     } else {
@@ -51,4 +53,23 @@ router.delete("/", authenticateToken, async(req, res) =>{
     }
 })
 
+// middleware
+
+// ensure currUser follows userID to view userID post
+async function authorizedViewer(req, res, next){
+    // user must be loking at own post history or follow user from query 
+    const currUser = req.user;
+    const {userID} = req.query;
+
+    const user = await userService.getUserById(currUser.id);
+    const followingList = user.following;
+    console.log(user.following);
+
+    if (currUser.id == userID || (followingList.size > 0 && followingList.has(userID))){
+        next();
+    } else {
+        res.status(400).json({message: `Not allowed to view posts.`});
+ 
+    }
+}
 module.exports = router;

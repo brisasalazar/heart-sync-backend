@@ -12,6 +12,18 @@ const { authenticateToken, decodeJWT } = require("../util/jwt");
 
 //logic
 
+// User retrieval route
+router.get("/profile", authenticateToken, async(req, res) =>{
+    const currUser = req.user;
+    console.log(currUser);
+    const data = await userService.getUserById(currUser.id);
+    if (data){
+        res.status(200).json({message: `Profile for ${currUser.username}`, data: data.description});
+    } else{
+        req.status(400).json({message: `Unable to retrieve profile for ${currUser.username}`})
+    }
+});
+
 // User Posting Route
 router.post("/", validatePostUser, async (req, res) => {
     const data = await userService.postUser(req.body);
