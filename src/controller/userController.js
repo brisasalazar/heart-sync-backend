@@ -95,6 +95,8 @@ router.put("/following", validateLoginStatus, async (req, res) => {
     }
 })
 
+// Alternate way to handle "followers" list updating
+
 // router.put("/followers", validateLoginStatus, async (req, res) => {
 //     const {followingId} = req.body;
 
