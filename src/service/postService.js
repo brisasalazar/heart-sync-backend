@@ -84,7 +84,7 @@ async function createPost(userID, postInfo){
             return null;
         }
     } catch(err){
-        logger.error("error", err);
+        logger.error(err);
         return null;
     }
     
@@ -95,7 +95,7 @@ async function deletePost(userID, postID){
     try{
         const post = await postRepository.getPostByID(postID);
         console.log(post.Items);
-        if (post.Items == []){
+        if (post.Items != []){
             const data = await postRepository.deletePost(userID, postID);
             if (data){
                 logger.info(`Successfully deleted post`, data);
