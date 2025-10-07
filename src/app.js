@@ -12,7 +12,10 @@ const spotifyController = require("./controller/spotifyController");
 const lastFMController = require("./controller/lastFMController");
 const playlistBuilderController = require("./controller/playlistBuilderController");
 
-const PORT = 3000;
+require('dotenv').config();
+
+
+const PORT = 5000;
 
 app.use(bodyParser.json());
 app.use(express.json());
