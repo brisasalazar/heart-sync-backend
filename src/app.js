@@ -1,9 +1,10 @@
 // imports 
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
-const {logger, loggerMiddleware} = require('./util/logger');
-const {authenticateToken} = require("./util/jwt");
+const { logger, loggerMiddleware } = require('./util/logger');
+const { authenticateToken } = require("./util/jwt");
 
 // import the necessary functions from the user controller
 const userController = require("./controller/userController");
@@ -14,6 +15,7 @@ const playlistBuilderController = require("./controller/playlistBuilderControlle
 
 require('dotenv').config();
 
+app.use(cors());
 
 const PORT = 5000;
 
