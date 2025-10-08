@@ -18,7 +18,7 @@ router.get("/profile", authenticateToken, async(req, res) =>{
     console.log(currUser);
     const data = await userService.getUserById(currUser.id);
     if (data){
-        res.status(200).json({message: `Profile for ${currUser.username}`, data: data.description});
+        res.status(200).json({message: `Profile for ${currUser.username}`, data: data});
     } else{
         req.status(400).json({message: `Unable to retrieve profile for ${currUser.username}`})
     }
