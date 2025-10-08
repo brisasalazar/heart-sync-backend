@@ -2,6 +2,8 @@ const express = require("express");
 const { getUser, getTokenInfo, refreshToken, getPlaylists, createPlaylist, getTrackURI, addTracksToPlaylist } = require("../service/spotifyService.js");
 let session = require("../session/session.js");
 
+const { authenticateToken, decodeJWT } = require("../util/jwt.js");
+
 const spotifyController = express.Router();
 
 spotifyController.get("/login", (req, res) => {
@@ -56,14 +58,16 @@ spotifyController.get("/user", async (req, res) => {
     res.json(user)
 })
 
-spotifyController.post("/playlists/:userId", async (req, res) => { // change to post later
+spotifyController.post("/playlists/:userId", authenticateToken, async (req, res) => { // change to post later
     const { userId } = req.params;
     let { name, public, collaborative, description } = req.query;
 
     public = public === "true";
     collaborative = collaborative === "true";
 
-    const playlist = await createPlaylist(userId, name, public, collaborative, description);
+    const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
+
+    const playlist = await createPlaylist(userId, name, public, collaborative, description, localTranslatedToken.id);
 
     res.json(playlist)
 })
