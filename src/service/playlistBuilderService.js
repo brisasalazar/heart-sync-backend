@@ -51,4 +51,6 @@ function shuffleArray(array) {
       return array;
 }
 
+//async function
+
 module.exports = { populatePlaylist }
