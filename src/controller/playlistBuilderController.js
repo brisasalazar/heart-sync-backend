@@ -11,8 +11,18 @@ playlistBuilderController.post("/", authenticateToken, async (req, res) => { // 
     const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
 
 
-    const spotifyURIs = await populatePlaylist(playlistId, genre, artist, localTranslatedToken.id);
-    res.json(spotifyURIs);
+    const data = await populatePlaylist(playlistId, genre, artist, localTranslatedToken.id);
+    if (data) {
+        res.status(201).json({message: "User playlist has been populated successfully", data: data});
+    } else {
+        res.status(400).json({message: "Failed to populate user playlist", data: req.query});
+    } 
 });
+
+// possibly add routes for
+    // deleting a playlist
+    // getting all playlists associated with a user
+    // Getting a specific playlist by its Id
+
 
 module.exports = playlistBuilderController;

@@ -3,6 +3,9 @@ const { getAuthHeaders } = require("../util/auth.js");
 const playlistRepository = require("../repository/playlistRepository.js");
 const {logger} = require("../util/logger.js");
 
+const session = require("../session/session");
+
+
 async function getUser() {
     try{
         const response = await axios.get(process.env.API_BASE_URL + "me", { headers: getAuthHeaders() });
@@ -66,6 +69,13 @@ async function getPlaylists() {
 }
 
 async function createPlaylist(userId, name, isPublic, isCollaborative, description, localUserId) {
+    const sessionToken = session?.accessToken;
+
+    if (!sessionToken) {
+        logger.error("You are not logged into Spotify");
+        return null;
+    }
+    
     try{
         const headers = {
         ...getAuthHeaders(),

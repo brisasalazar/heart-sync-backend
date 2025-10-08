@@ -69,7 +69,13 @@ spotifyController.post("/playlists/:userId", authenticateToken, async (req, res)
 
     const playlist = await createPlaylist(userId, name, public, collaborative, description, localTranslatedToken.id);
 
-    res.json(playlist)
+    if (playlist) {
+        res.status(201).json({message: "User playlist has been created successfully", playlistId: playlist});
+    } else {
+        res.status(400).json({message: "Failed to create user playlist", data: req.query});
+    }
+    
+    // res.json(playlist)
 })
 
 // FOR TESTING
