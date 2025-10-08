@@ -67,10 +67,14 @@ async function getPlaylistsByUser(userId) {
     if (userId) {
         const command = new QueryCommand({
             TableName,
-            KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk)",
+            KeyConditionExpression: "#PK = :pkValue AND begins_with(#SK, :skValue)",
+            ExpressionAttributeNames: {
+                "#PK": "PK",
+                "#SK": "SK"
+            },
             ExpressionAttributeValues: {
-                ":pk": `USER#${userId}`,
-                ":sk": "PLAYLIST#"
+                ":pkValue": userId,
+                ":skValue": "PLAYLIST#"
             }
         });
 
@@ -86,19 +90,24 @@ async function getPlaylistsByUser(userId) {
     }
 }
 
-async function getPlaylist(userId, playlistId) {
+async function getPlaylistbyPlaylistId(userId, playlistId) {
     if (userId && playlistId) {
-        const command = new GetCommand({
+        const command = new QueryCommand({
             TableName,
-            Key: {
-                PK: `USER#${userId}`,
-                SK: `PLAYLIST#${playlistId}`
+            KeyConditionExpression: "#PK = :pkValue AND #SK = :skValue",
+            ExpressionAttributeNames: {
+                "#PK": "PK",
+                "#SK": "SK"
+            },
+            ExpressionAttributeValues: {
+                ":pkValue": userId,
+                ":skValue": `PLAYLIST#Playlist${playlistId}`
             }
         });
 
         try {
             const result = await documentClient.send(command);
-            return result.Item || null;
+            return result.Items[0] || null;
         } catch (error) {
             logger.error(
                 `Error retrieving playlist with ID ${playlistId} from user with ID ${userId}: ${error.message}`
@@ -115,9 +124,10 @@ async function deletePlaylist(userId, playlistId) {
         const command = new DeleteCommand({
             TableName,
             Key: {
-                PK: `USER#${userId}`,
-                SK: `PLAYLIST#${playlistId}`
-            }
+                PK: userId,
+                SK: `PLAYLIST#Playlist${playlistId}`
+            },
+            ReturnValues: 'ALL_OLD',
         });
 
         try {
@@ -136,10 +146,16 @@ async function deletePlaylist(userId, playlistId) {
     }
 }
 
+// async function tester() {
+//     console.log(await deletePlaylist("USER#user5dbd0e3b-6718-46ca-9867-f2df7765fea5", "4g7D82R1VFGHVmdmIgsVvd"));
+// }
+
+// tester();
+
 module.exports = { 
     createPlaylist,
     addSongsToPlaylist,
     getPlaylistsByUser,
-    getPlaylist,
+    getPlaylistbyPlaylistId,
     deletePlaylist 
 };
