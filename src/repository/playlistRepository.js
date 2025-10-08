@@ -107,7 +107,7 @@ async function getPlaylistbyPlaylistId(userId, playlistId) {
 
         try {
             const result = await documentClient.send(command);
-            return result.Items || null;
+            return result.Items[0] || null;
         } catch (error) {
             logger.error(
                 `Error retrieving playlist with ID ${playlistId} from user with ID ${userId}: ${error.message}`
