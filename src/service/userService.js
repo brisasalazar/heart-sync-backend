@@ -73,6 +73,22 @@ async function updateUserPassword(user_id, oldPassword, newPassword) {
     }
 }
 
+async function updateUsername(user_id, oldUsername, newUsername) {
+    if (await validateUpdateUsername(user_id, oldUsername, newUsername)) {
+        const data = await userRepository.updateUserFields(user_id, {"username": newUsername});
+        if (data) {
+            logger.info(`Username has been updated: ${JSON.stringify(data)}`);
+            return data;
+        } else {
+            logger.info(`Failed to update username: ${JSON.stringify(user_id, newUsername)}`);
+            return null;
+        }
+    } else {
+        logger.info(`Failed to validate new username change: ${JSON.stringify(user_id, newUsername)}`);
+        return null;
+    }
+}
+
 async function addFollowingUser(user_id, followingId) {
     if (await validateAddFollowingUser(user_id, followingId)) {
         // check to see if the following list exists
@@ -274,6 +290,21 @@ async function validateUpdateUserPassword(user_id, oldPassword, newPassword) {
     return (userCheck && await bcrypt.compare(oldPassword, userCheck.password) && newPassword.length > 0)
 }
 
+async function validateUpdateUsername(user_id, oldUsername, newUsername) {
+    if (!user_id || !oldUsername || !newUsername) {
+        logger.info(`Invalid Username Update Input`);
+        return null;
+    } else if (oldUsername == newUsername){
+        logger.info(`Cannot replace Username with the same Username`);
+        return null;
+    }
+
+    const userCheck = await getUserById(user_id);
+    const newNameCheck = await getUserByUsername(newUsername);
+
+    return (userCheck && userCheck.username == oldUsername && !newNameCheck);
+}
+
 async function validateAddFollowingUser(user_id, followingId) {
     if (!user_id || !followingId || user_id == followingId) {
         logger.info(`Invalid Following List Update Input`);
@@ -349,6 +380,7 @@ module.exports = {
     getUserById,
     updateUserDescription,
     updateUserPassword,
+    updateUsername,
     addFollowingUser,
     addUserToFollowersList,
     deleteUser,
