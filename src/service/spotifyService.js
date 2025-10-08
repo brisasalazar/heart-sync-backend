@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { getAuthHeaders } = require("../util/auth.js");
+const playlistRepository = require("../repository/playlistRepository.js");
 const {logger} = require("../util/logger.js");
 
 async function getUser() {
@@ -64,7 +65,7 @@ async function getPlaylists() {
     }
 }
 
-async function createPlaylist(userId, name, isPublic, isCollaborative, description) {
+async function createPlaylist(userId, name, isPublic, isCollaborative, description, localUserId) {
     try{
         const headers = {
         ...getAuthHeaders(),
@@ -78,7 +79,17 @@ async function createPlaylist(userId, name, isPublic, isCollaborative, descripti
             description
         };
 
+
         const response = await axios.post(process.env.API_BASE_URL + `users/${userId}/playlists`, body, { headers });
+
+        const playlist = {
+            playlistName: name,
+            description,
+            playlistId: response.data.id,
+        }
+
+        await playlistRepository.createPlaylist(localUserId, playlist);
+
         return response.data.id;
 
     } catch(err){

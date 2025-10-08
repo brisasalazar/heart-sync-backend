@@ -1,20 +1,20 @@
 const { logger } = require("../util/logger");
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, GetCommand, QueryCommand, PutCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, GetCommand, QueryCommand, PutCommand, UpdateCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
 
-const client = new DynamoDBClient({ region: "us-east-2" });
+const client = new DynamoDBClient({ region: "us-east-1" });
 const documentClient = DynamoDBDocumentClient.from(client);
 
-const TableName = "Heart-Sync";
+const TableName = "HeartSync";
 
 async function createPlaylist(userId, playlist) {
     if (userId && playlist) {
         const item = {
-            PK: `USER#${userId}`,
-            SK: `PLAYLIST#${playlist.playlistId}`,
+            PK: userId,
+            SK: `PLAYLIST#Playlist${playlist.playlistId}`,
             playlistName: playlist.playlistName,
             description: playlist.description,
-            songIds: playlist.songIds,
+            // songIds: playlist.songIds,
             timestamp: Date.now()
         };
 
@@ -32,6 +32,34 @@ async function createPlaylist(userId, playlist) {
         }
     } else {
         throw new Error("New playlist information not provided to the repository layer.");
+    }
+}
+
+async function addSongsToPlaylist(userId, playlistId, songIdArray) {
+    if (userId && playlistId && songIdArray) {
+        const command = new UpdateCommand({
+            TableName,
+            Key: {
+                PK: userId,
+                SK: `PLAYLIST#Playlist${playlistId}`,
+            },
+            UpdateExpression: "set #songIds = :songIds",
+            ExpressionAttributeNames: {
+                "#songIds": "songIds"
+            },
+            ExpressionAttributeValues: {
+                ":songIds": songIdArray
+            }
+        })
+
+        try {
+                const data = await documentClient.send(command);
+                logger.info(`UPDATE command to databse complete ${JSON.stringify(data)}`);
+                return data;
+        }catch(error){
+            logger.error(error);
+            return null;
+        }
     }
 }
 
@@ -108,4 +136,10 @@ async function deletePlaylist(userId, playlistId) {
     }
 }
 
-module.exports = { createPlaylist, getPlaylistsByUser, getPlaylist, deletePlaylist };
+module.exports = { 
+    createPlaylist,
+    addSongsToPlaylist,
+    getPlaylistsByUser,
+    getPlaylist,
+    deletePlaylist 
+};
