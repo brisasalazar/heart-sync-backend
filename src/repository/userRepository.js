@@ -177,7 +177,7 @@ async function getUserbyUserId(user_id) {
     try{
         const data = await documentClient.send(command);
         logger.info(`Query command to database complete ${JSON.stringify(data)}`);
-        console.log(data.Items[0]);
+        //console.log(data.Items[0]);
         return data.Items[0];
     } catch(error) {
         logger.error(error);
