@@ -31,7 +31,8 @@ spotifyController.get("/callback", async (req, res) => {
     session.refreshToken = tokenInfo["refresh_token"];
     session.expiresAt = Date.now() + tokenInfo["expires_in"];
 
-    res.redirect("/spotify/playlists");
+    const redirectURL = `http://localhost:5173/spotify-success?accessToken=${session.accessToken}`
+    res.redirect(redirectURL);
 })
 
 spotifyController.get("/playlists", async (req, res) => {
