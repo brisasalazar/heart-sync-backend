@@ -15,9 +15,15 @@ const playlistBuilderController = require("./controller/playlistBuilderControlle
 
 require('dotenv').config();
 
-app.use(cors());
+// app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
-const PORT = 5000;
+const PORT = 3001;
 
 app.use(bodyParser.json());
 app.use(express.json());
