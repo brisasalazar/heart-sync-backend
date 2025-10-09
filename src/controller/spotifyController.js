@@ -18,7 +18,7 @@ spotifyController.get("/login", (req, res) => {
     })
 
     const authUrl = `${process.env.AUTH_URL}?${params.toString()}`
-    console.log(authUrl);
+    //console.log(authUrl);
     res.redirect(authUrl);
 })
 

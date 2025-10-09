@@ -32,7 +32,7 @@ router.get("/post-history", authenticateToken, authorizedViewer, async(req, res)
 // create post
 router.post("/", authenticateToken, async(req, res) => {
     const currUser = req.user;
-    console.log(currUser);
+    //console.log(currUser);
     const data = await postService.createPost(currUser.id, req.body);
      if (data){
         res.status(201).json({message: `Post created successfully.`, data:data});
@@ -63,7 +63,7 @@ async function authorizedViewer(req, res, next){
 
     const user = await userService.getUserById(currUser.id);
     const followingList = user.following;
-    console.log(user.following);
+    //console.log(user.following);
 
     if (currUser.id == userID || (followingList.size > 0 && followingList.has(userID))){
         next();

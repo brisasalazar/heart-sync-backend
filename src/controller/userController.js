@@ -15,7 +15,7 @@ const { authenticateToken, decodeJWT } = require("../util/jwt");
 // User retrieval route
 router.get("/profile", authenticateToken, async(req, res) =>{
     const currUser = req.user;
-    console.log(currUser);
+    //console.log(currUser);
     const data = await userService.getUserById(currUser.id);
     if (data){
         res.status(200).json({message: `Profile for ${currUser.username}`, data: data});
@@ -54,7 +54,7 @@ router.post("/login", async (req, res) => {
             }
         );
 
-        console.log(await decodeJWT(token));
+        //console.log(await decodeJWT(token));
 
         res.status(200).json({message: "you have logged in", token});
     } else {

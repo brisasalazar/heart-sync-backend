@@ -94,7 +94,7 @@ async function createPost(userID, postInfo){
 async function deletePost(userID, postID){
     try{
         const post = await postRepository.getPostByID(postID);
-        console.log(post.Items);
+        //console.log(post.Items);
         if (post.Items != []){
             const data = await postRepository.deletePost(userID, postID);
             if (data){

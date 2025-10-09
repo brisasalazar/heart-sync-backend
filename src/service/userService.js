@@ -95,7 +95,7 @@ async function addFollowingUser(user_id, followingId) {
         const currentUser = await getUserById(user_id);
         
         let followingList = currentUser?.following;
-        console.log(followingList);
+        //console.log(followingList);
 
         if (followingList) {
             followingList.add(followingId);
