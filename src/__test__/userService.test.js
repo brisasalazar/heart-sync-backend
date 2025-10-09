@@ -483,3 +483,111 @@ describe("User Deletion Suite", () => {
 
     // test("")
 })
+
+describe("Get User by ID Suite", () => {
+    test("Inputing a valid ID should return a user object", async () => {
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:new Set (['user5dbd0e3b-6718-46ca-9867-f2df7765fea5']),
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        });
+
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef";
+
+        const user = await userService.getUserById(dummyUserId); 
+        expect(userRepository.getUserbyUserId).toHaveBeenCalled();
+        expect(user.PK).toBe(dummyUserId);
+
+
+    })
+
+    test("Inputing a null ID should return a null object", async () => {
+        const dummyUserId = null;
+
+        const user = await userService.getUserById(dummyUserId); 
+        expect(user).toBeNull;
+    })
+
+    test("Inputting an ID that doesn't exist should return a null object", async () => {
+        userRepository.getUserbyUserId.mockReturnValue(null);
+        const dummyInvalidUserId = "USER#user54fcb9e1-5d8e";
+
+        const user = await userService.getUserById(dummyInvalidUserId); 
+        expect(user).toBeNull;
+    })
+})
+
+describe("Get User by Username Suite", () => {
+    test("Inputing a valid Username should return a user object", async () => {
+        userRepository.getUserByUsername.mockReturnValue({
+            following:new Set (['user5dbd0e3b-6718-46ca-9867-f2df7765fea5']),
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        });
+
+        const dummyUsername = "revature101";
+
+        const user = await userService.getUserByUsername(dummyUsername); 
+        expect(userRepository.getUserByUsername).toHaveBeenCalled();
+        expect(user.username).toBe(dummyUsername);
+
+
+    })
+
+    test("Inputing a null Username should return a null object", async () => {
+        const dummyUsername = null;
+
+        const user = await userService.getUserByUsername(dummyUsername); 
+        expect(user).toBeNull;
+    })
+
+    test("Inputting an Username that doesn't exist should return a null object", async () => {
+        userRepository.getUserByUsername.mockReturnValue(null);
+        const dummyInvalidUserId = "invalidUsername";
+
+        const user = await userService.getUserByUsername(dummyInvalidUserId); 
+        expect(user).toBeNull;
+    })
+})
+
+describe("Get User by Email Suite", () => {
+    test("Inputing a valid email should return a user object", async () => {
+        userRepository.getUserByEmail.mockReturnValue({
+            following:new Set (['user5dbd0e3b-6718-46ca-9867-f2df7765fea5']),
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        });
+
+        const dummyEmail = "example@revature.net";
+
+        const user = await userService.getUserByEmail(dummyEmail); 
+        expect(userRepository.getUserByEmail).toHaveBeenCalled();
+        expect(user.email).toBe(dummyEmail);
+
+
+    })
+
+    test("Inputing a null email should return a null object", async () => {
+        const dummyEmail = null;
+
+        const user = await userService.getUserByEmail(dummyEmail); 
+        expect(user).toBeNull;
+    })
+
+    test("Inputting an email that doesn't exist should return a null object", async () => {
+        userRepository.getUserByEmail.mockReturnValue(null);
+        const dummyInvalidEmail = "USER#@revature.net";
+
+        const user = await userService.getUserById(dummyInvalidEmail); 
+        expect(user).toBeNull;
+    })
+})
