@@ -1,8 +1,9 @@
 const express = require("express");
-const { getUser, getTokenInfo, refreshToken, getPlaylists, createPlaylist, getTrackURI, addTracksToPlaylist } = require("../service/spotifyService.js");
+const { getUser, getTokenInfo, refreshToken, getPlaylists, getSpotifyPlaylistbyPlaylistId, createPlaylist, getTrackURI, addTracksToPlaylist } = require("../service/spotifyService.js");
 let session = require("../session/session.js");
 
 const { authenticateToken, decodeJWT } = require("../util/jwt.js");
+const { getPlaylistbyPlaylistId } = require("../repository/playlistRepository.js");
 
 const spotifyController = express.Router();
 
@@ -18,7 +19,7 @@ spotifyController.get("/login", (req, res) => {
     })
 
     const authUrl = `${process.env.AUTH_URL}?${params.toString()}`
-    //console.log(authUrl);
+    console.log(authUrl);
     res.redirect(authUrl);
 })
 
@@ -40,6 +41,12 @@ spotifyController.get("/playlists", async (req, res) => {
     res.json(playlists);
 })
 
+spotifyController.get("/playlists/:playlistId", async (req, res) => {
+    const {playlistId} = req.params;
+    const playlist = await getSpotifyPlaylistbyPlaylistId(playlistId);
+    res.json(playlist);
+})
+
 spotifyController.get("/refresh-token", async (req, res) => {
     if (Date.now() > session.expiresAt) {
         const newTokenInfo = await refreshToken(session);
@@ -53,9 +60,6 @@ spotifyController.get("/refresh-token", async (req, res) => {
 
 spotifyController.get("/user", async (req, res) => {
     const user = await getUser();
-    const trackURI = await getTrackURI("One Direction", "Olivia");
-    await addTracksToPlaylist("3Bgvpn0dwhA7kNh6T0P1Og", [trackURI]);
-
     res.json(user)
 })
 
