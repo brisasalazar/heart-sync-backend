@@ -102,4 +102,4 @@ async function validatePopulatePlaylist(playlistId, genre, artist, user_id) {
 
 //async function
 
-module.exports = { populatePlaylist }
+module.exports = { populatePlaylist, getPlaylistByPlaylistId }
