@@ -140,30 +140,30 @@ async function addFollowingUser(user_id, followingId) {
 }
 
 // Not in use
-// async function addUserToFollowersList(user_id, followingId) {
-//     if (await validateAddUserToFollowersList(user_id, followingId)) {
-//         const followedUser = await getUserById(followingId);
-//         let followersList = followedUser?.followers;
+async function addUserToFollowersList(user_id, followingId) {
+    if (await validateAddUserToFollowersList(user_id, followingId)) {
+        const followedUser = await getUserById(followingId);
+        let followersList = followedUser?.followers;
 
-//         if (followersList) {
-//             followersList.add(user_id);
-//         } else {
-//             followersList = new Set([user_id]);
-//         }
+        if (followersList) {
+            followersList.add(user_id);
+        } else {
+            followersList = new Set([user_id]);
+        }
 
-//         const data = await userRepository.updateUserFields(followingId, {"followers": followersList});
-//         if (data) {
-//             logger.info(`User followers list has been updated: ${JSON.stringify(data)}`)
-//             return data;
-//         } else {
-//             logger.info(`Failed to update user followers list: ${JSON.stringify(user_id, followingId)}`)
-//             return null;
-//         }
-//     } else {
-//         logger.info(`Failed to validate new followers list change: ${JSON.stringify(user_id, followingId)}`);
-//         return null;
-//     }
-// }
+        const data = await userRepository.updateUserFields(followingId, {"followers": followersList});
+        if (data) {
+            logger.info(`User followers list has been updated: ${JSON.stringify(data)}`)
+            return data;
+        } else {
+            logger.info(`Failed to update user followers list: ${JSON.stringify(user_id, followingId)}`)
+            return null;
+        }
+    } else {
+        logger.info(`Failed to validate new followers list change: ${JSON.stringify(user_id, followingId)}`);
+        return null;
+    }
+}
 
 async function deleteUser(user_id, password) {
     if (await validateUserDeletion(user_id, password)) {
@@ -382,6 +382,6 @@ module.exports = {
     updateUserPassword,
     updateUsername,
     addFollowingUser,
-    //addUserToFollowersList,
+    addUserToFollowersList,
     deleteUser,
 }

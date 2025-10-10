@@ -88,7 +88,7 @@ async function getPlaylistByPlaylistId(user_id, playlistId) {
 
                 console.log(fullSongSet);
                 delete data.songIds;
-                //const mySet = new Set(['apple', 'banana', 'orange']);
+                const mySet = new Set(['apple', 'banana', 'orange']);
                 data.tracksInfo = Array.from(fullSongSet);
 
             }
@@ -96,7 +96,7 @@ async function getPlaylistByPlaylistId(user_id, playlistId) {
             return data;
 
         } else {
-            logger.error(`No Playlist found by Playlist Id: ${playlistId}`);
+            logger.info(`No Playlist found by Playlist Id: ${playlistId}`);
             return null;
         }
     } else {
@@ -104,6 +104,16 @@ async function getPlaylistByPlaylistId(user_id, playlistId) {
         return null;
     }
 }
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+      }
+      return array;
+}
+
+
 
 async function validatePopulatePlaylist(playlistId, genre, artist, user_id) {
 
@@ -126,11 +136,7 @@ async function validatePopulatePlaylist(playlistId, genre, artist, user_id) {
     const requestedPlaylist = await getPlaylistByPlaylistId(user_id, playlistId);
     const currentUser = await userService.getUserById(user_id);
 
-    if (requestedPlaylist && currentUser) {
-        return true;
-    } else {
-        return false;
-    }
+    return (requestedPlaylist && currentUser);
 }
 
 function splitArray(arr, k) {
@@ -141,14 +147,6 @@ function splitArray(arr, k) {
     return result;
 }
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-      }
-      return array;
-}
-
 //async function
 
-module.exports = { populatePlaylist, getPlaylistByPlaylistId, validatePopulatePlaylist }
+module.exports = { populatePlaylist, getPlaylistByPlaylistId }
