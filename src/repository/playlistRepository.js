@@ -5,6 +5,10 @@ const { DynamoDBDocumentClient, GetCommand, QueryCommand, PutCommand, UpdateComm
 const client = new DynamoDBClient({ region: "us-east-1" });
 const documentClient = DynamoDBDocumentClient.from(client);
 
+const { getAuthHeaders } = require("../util/auth.js");
+
+const session = require("../session/session");
+
 const TableName = "HeartSync";
 
 async function createPlaylist(userId, playlist) {
@@ -119,6 +123,57 @@ async function getPlaylistbyPlaylistId(userId, playlistId) {
     }
 }
 
+async function getInfoOnTracks(trackIds) {
+    try {
+        const url = process.env.API_BASE_URL + "tracks?ids=" + trackIds;
+
+        const headers = {
+            ...getAuthHeaders(),
+            "Content-Type": "application/json"
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers,
+        })
+
+        if (!response) {
+            logger.info("Failed to query Spotify API");
+        }
+
+        
+
+        const data = await response.json();
+        if (!data) {
+            return null;
+        }
+
+        let trackDetails = new Set();
+
+        data.tracks.forEach(function(track) {
+            const songTitle = track.name;
+            const songDuration = track.duration_ms;
+            const songAlbum = track.album.name;
+            const songArtists = track.artists[0].name;
+            //const detailsArray = [songTitle, songArtists, songAlbum, songDuration];
+            const detailsArray = {
+                "Title": songTitle,
+                "Artist": songArtists,
+                "Album": songAlbum,
+                "Duration_ms": songDuration
+            }
+
+            trackDetails.add(detailsArray);
+        })
+        //console.log(trackDetails);
+        return trackDetails;
+
+    } catch(err) {
+        logger.error(err);
+        return null;
+    }
+}
+
 async function deletePlaylist(userId, playlistId) {
     if (userId && playlistId) {
         const command = new DeleteCommand({
@@ -157,5 +212,6 @@ module.exports = {
     addSongsToPlaylist,
     getPlaylistsByUser,
     getPlaylistbyPlaylistId,
+    getInfoOnTracks,
     deletePlaylist 
 };

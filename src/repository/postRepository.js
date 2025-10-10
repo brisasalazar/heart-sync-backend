@@ -22,7 +22,7 @@ const client = new DynamoDBClient({region: "us-east-1"});
 
 const documentClient = DynamoDBDocumentClient.from(client);
 
-const TableName = "heart-sync"; // update tabel name with personal table name
+const TableName = "HeartSync"; // update tabel name with personal table name
 
 // get all posts by user 
 async function getPostsFromUser(userID){
