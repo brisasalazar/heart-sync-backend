@@ -13,46 +13,46 @@
 
 // imports 
 // import aws sdk clients, dyanodb, and fs modules 
-const { DynamoDBClient} = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand, QueryCommand, ScanCommand, UpdateCommand} = require("@aws-sdk/lib-dynamodb")
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, GetCommand, PutCommand, DeleteCommand, QueryCommand, ScanCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb")
 
-const {logger} = require("../util/logger");
+const { logger } = require("../util/logger");
 
-const client = new DynamoDBClient({region: "us-east-1"});
+const client = new DynamoDBClient({ region: "us-east-1" });
 
 const documentClient = DynamoDBDocumentClient.from(client);
 
-const TableName = "heart-sync"; // update tabel name with personal table name
+const TableName = "HeartSync"; // update table name with personal table name
 
 // get all posts by user 
-async function getPostsFromUser(userID){
+async function getPostsFromUser(userID) {
     const command = new QueryCommand({
         TableName,
         KeyConditionExpression: "PK = :userID AND begins_with(SK, :sk)",
-        ExpressionAttributeValues: {":userID" : userID, ":sk" : "POST#"}
+        ExpressionAttributeValues: { ":userID": userID, ":sk": "POST#" }
     })
-    try{
+    try {
         const data = await documentClient.send(command);
         logger.info("GET command successful.");
         return data;
-    } catch(err){
+    } catch (err) {
         logger.error(err);
         return null;
     }
 }
 
 // get post by its id
-async function getPostByID(userID, postID){
+async function getPostByID(userID, postID) {
     const command = new QueryCommand({
         TableName,
         KeyConditionExpression: "PK = :userID AND SK = :postID",
-        ExpressionAttributeValues: {":userID" : `USER#${userID}`, ":postID" : `POST#${postID}`}
+        ExpressionAttributeValues: { ":userID": `USER#${userID}`, ":postID": `POST#${postID}` }
     })
-    try{
+    try {
         const data = await documentClient.send(command);
         logger.info("GET command successful.");
         return data;
-    } catch(err){
+    } catch (err) {
         logger.error(err);
         return null;
     }
@@ -60,12 +60,12 @@ async function getPostByID(userID, postID){
 
 
 // create a post 
-async function putPost(postInfo){
+async function putPost(postInfo) {
     const command = new PutCommand({
-        TableName, 
-        Item:{
+        TableName,
+        Item: {
             PK: postInfo.PK,
-            SK: `POST#${postInfo.SK}`, 
+            SK: `POST#${postInfo.SK}`,
             username: postInfo.username,
             pst_caption: postInfo.pst_caption,
             pst_activityType: postInfo.pst_activityType,
@@ -74,36 +74,36 @@ async function putPost(postInfo){
             pst_timestamp: postInfo.pst_timestamp
         }
     })
-    try{
+    try {
         const data = await documentClient.send(command);
         logger.info(`PUT command completed`, data);
         return data;
-    } catch (err){
+    } catch (err) {
         logger.error(`Unable to complete command`, err);
         return null;
     }
-} 
+}
 
 // delete post
-async function deletePost(userID, postID){
-     const command = new DeleteCommand({
-            TableName, 
-            Key: {
-                PK: userID,
-                SK: postID
-            }
-        });
-    
-    try{    
+async function deletePost(userID, postID) {
+    const command = new DeleteCommand({
+        TableName,
+        Key: {
+            PK: userID,
+            SK: postID
+        }
+    });
+
+    try {
         const data = await documentClient.send(command);
 
         logger.info(`DELETE command successful.`, data);
         return data;
 
-    } catch (err){
+    } catch (err) {
         logger.error(`Post not found.`);
         return null;
     }
-}   
+}
 
-module.exports = {getPostByID, getPostsFromUser, putPost, deletePost}
+module.exports = { getPostByID, getPostsFromUser, putPost, deletePost }
