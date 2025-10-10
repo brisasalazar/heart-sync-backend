@@ -68,6 +68,16 @@ async function getPlaylists() {
     }
 }
 
+async function getSpotifyPlaylistbyPlaylistId(playlistId) {
+    try{
+        const response = await axios.get(process.env.API_BASE_URL + `playlists/${playlistId}`, { headers: getAuthHeaders() })
+        return response.data;
+    } catch(err){
+        logger.error(err);
+        return null;
+    }
+}
+
 async function createPlaylist(userId, name, isPublic, isCollaborative, description, localUserId) {
     const sessionToken = session?.accessToken;
 
@@ -154,4 +164,4 @@ async function addTracksToPlaylist(playlistId, trackURIs) {
     }
 }
 
-module.exports = { getUser, getTokenInfo, refreshToken, getPlaylists, createPlaylist, getTrackURI, addTracksToPlaylist }
+module.exports = { getUser, getTokenInfo, refreshToken, getPlaylists, getSpotifyPlaylistbyPlaylistId, createPlaylist, getTrackURI, addTracksToPlaylist }

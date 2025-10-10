@@ -58,38 +58,43 @@ async function getPlaylistByPlaylistId(user_id, playlistId) {
 
             let trackInfo = [];
 
-            const chunkedArray = splitArray(data.songIds, 50);
+            if (data.songIds){
 
-            for (var i = 0; i < chunkedArray.length; i++) {
-                let currentTrackInfo = ""
-                chunkedArray[i].forEach(function(track) {
-                    const substringToFind = "track:";
-                    const startIndex = track.indexOf(substringToFind);
-                    const splitPoint = startIndex + substringToFind.length;
-                    const extractedId = track.slice(splitPoint);
-                    currentTrackInfo += extractedId + ",";
-                })
-                trackInfo.push(currentTrackInfo);
+                const chunkedArray = splitArray(data.songIds, 50);
+
+                for (var i = 0; i < chunkedArray.length; i++) {
+                    let currentTrackInfo = ""
+                    chunkedArray[i].forEach(function(track) {
+                        const substringToFind = "track:";
+                        const startIndex = track.indexOf(substringToFind);
+                        const splitPoint = startIndex + substringToFind.length;
+                        const extractedId = track.slice(splitPoint);
+                        currentTrackInfo += extractedId + ",";
+                    })
+                    trackInfo.push(currentTrackInfo);
+                }
+
+                // for each in trackInfo, make a call to the spotify API,
+                // pull the relevant song information into a JSON object
+                // push that to a new set
+                // replace songIds with that
+
+                const fullSongSet = new Set();
+
+                for (var i = 0; i < trackInfo.length; i++) {
+                    const songSet = await playlistRepository.getInfoOnTracks(trackInfo[i]);
+                    songSet.forEach(item => fullSongSet.add(item));
+                }
+
+                console.log(fullSongSet);
+                delete data.songIds;
+                const mySet = new Set(['apple', 'banana', 'orange']);
+                data.tracksInfo = Array.from(fullSongSet);
+
             }
-
-            // for each in trackInfo, make a call to the spotify API,
-            // pull the relevant song information into a JSON object
-            // push that to a new set
-            // replace songIds with that
-
-            const fullSongSet = new Set();
-
-            for (var i = 0; i < trackInfo.length; i++) {
-                const songSet = await playlistRepository.getInfoOnTracks(trackInfo[i]);
-                songSet.forEach(item => fullSongSet.add(item));
-            }
-
-            console.log(fullSongSet);
-            delete data.songIds;
-            const mySet = new Set(['apple', 'banana', 'orange']);
-            data.tracksInfo = Array.from(fullSongSet);
 
             return data;
+
         } else {
             logger.info(`No Playlist found by Playlist Id: ${playlistId}`);
             return null;
