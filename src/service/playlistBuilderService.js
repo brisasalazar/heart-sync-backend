@@ -55,6 +55,40 @@ async function getPlaylistByPlaylistId(user_id, playlistId) {
         const data = await playlistRepository.getPlaylistbyPlaylistId(user_id, playlistId);
         if (data) {
             logger.info(`Playlist found by ID: ${JSON.stringify(data.playlistName)}`);
+
+            let trackInfo = [];
+
+            const chunkedArray = splitArray(data.songIds, 50);
+
+            for (var i = 0; i < chunkedArray.length; i++) {
+                let currentTrackInfo = ""
+                chunkedArray[i].forEach(function(track) {
+                    const substringToFind = "track:";
+                    const startIndex = track.indexOf(substringToFind);
+                    const splitPoint = startIndex + substringToFind.length;
+                    const extractedId = track.slice(splitPoint);
+                    currentTrackInfo += extractedId + ",";
+                })
+                trackInfo.push(currentTrackInfo);
+            }
+
+            // for each in trackInfo, make a call to the spotify API,
+            // pull the relevant song information into a JSON object
+            // push that to a new set
+            // replace songIds with that
+
+            const fullSongSet = new Set();
+
+            for (var i = 0; i < trackInfo.length; i++) {
+                const songSet = await playlistRepository.getInfoOnTracks(trackInfo[i]);
+                songSet.forEach(item => fullSongSet.add(item));
+            }
+
+            console.log(fullSongSet);
+            delete data.songIds;
+            const mySet = new Set(['apple', 'banana', 'orange']);
+            data.tracksInfo = Array.from(fullSongSet);
+
             return data;
         } else {
             logger.info(`No Playlist found by Playlist Id: ${playlistId}`);
@@ -98,6 +132,14 @@ async function validatePopulatePlaylist(playlistId, genre, artist, user_id) {
     const currentUser = await userService.getUserById(user_id);
 
     return (requestedPlaylist && currentUser);
+}
+
+function splitArray(arr, k) {
+    const result = [];
+    for (let i = 0; i < arr.length; i += k) {
+        result.push(arr.slice(i, i + k));
+    }
+    return result;
 }
 
 //async function
