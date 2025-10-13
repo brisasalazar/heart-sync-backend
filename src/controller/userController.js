@@ -9,6 +9,7 @@ const secretKey = "my-secret-key"
 // local imports
 const userService = require("../service/userService");
 const { authenticateToken, decodeJWT } = require("../util/jwt");
+const userProfileBucket = require("../bucket/userBucket");
 
 //logic
 
@@ -165,6 +166,63 @@ router.delete("/", validateLoginStatus, async (req, res) => {
     }
 })
 
+// BUCKET INTEGRATION
+
+router.get("/:userId/profile-pic", authenticateToken, validateUser, async(req, res)=>{
+    const {userId} = req.params;
+    const key = `${userId}/profile-pic`;
+
+    const data = await userProfileBucket.getProfilePic(key);
+    if (data){
+        res.status(200).json({ message: `Profile pic for user ${userId}`, data:data});
+    } else {
+        res.status(404).json({message: `No profile pic found for user ${userId}`});
+    }
+})
+
+router.post("/profile-pic", authenticateToken, async(req, res)=>{
+    const filePath = req.body.filePath;
+    
+    if (!filePath) {
+        return res.status(400).json({message: "filePath is required in request body"});
+    }
+
+    const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
+    const userId = localTranslatedToken.id;
+    console.log(userId);
+
+    if (userId){
+        const key = `${userId}/profile-pic`;
+
+        console.log(`Attempting to upload profile pic - FilePath: ${filePath}, Key: ${key}`);
+
+        const data = await userProfileBucket.addProfilePic(filePath, key);
+        
+        if (data){
+            res.status(200).json({message: `Added profile pic for user ${userId}`, data: data});
+        } else {
+            res.status(400).json({message: `Error adding profile pic for user ${userId}`, filePath: filePath});
+        }
+    } else{
+        res.status(400).json({message: `No userId found.`});
+    }
+    
+})
+
+router.delete("/profile-pic", authenticateToken, async(req, res)=>{
+    const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
+    const userId = localTranslatedToken.id;
+    const key = `${userId}/profile-pic`;
+
+    const data = await userProfileBucket.deleteProfilePic(key);
+    if (data){
+        res.status(200).json({message: `Deleted profile pic for user ${userId}`, data: data});
+    } else {
+        res.status(400).json({message: `Error deleting profile pic for user ${userId}`});
+    }
+})
+
+// MIDDLEWARE
 async function validateLoginStatus(req, res, next) {
 
     const currentToken = req.headers['authorization']?.split(" ")[1];
@@ -188,6 +246,15 @@ async function validatePostUser(req, res, next) {
         next();
     } else {
         res.status(400).json({ message: "invalid username, password, or email", data: user });
+    }
+}
+
+async function validateUser(req, res, next){
+    const {userId} = req.params;
+    if (userId && userService.getUserById(userId)){
+        next();
+    } else {
+        res.status(400).json({ message: "Invalid user id", data: userId });
     }
 }
 
