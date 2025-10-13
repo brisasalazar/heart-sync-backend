@@ -9,7 +9,7 @@ const secretKey = "my-secret-key"
 // local imports
 const userService = require("../service/userService");
 const { authenticateToken, decodeJWT } = require("../util/jwt");
-const userProfileBucket = require("../bucket/userBucket");
+const userBucket = require("../bucket/userBucket");
 
 //logic
 
@@ -170,9 +170,13 @@ router.delete("/", validateLoginStatus, async (req, res) => {
 
 router.get("/:userId/profile-pic", authenticateToken, validateUser, async(req, res)=>{
     const {userId} = req.params;
-    const key = `${userId}/profile-pic`;
+    console.log(userId);
+    const prefix = `${userId}/profile-pic/`;
+    console.log(prefix);
 
-    const data = await userProfileBucket.getProfilePic(key);
+    const data = await userBucket.getProfilePic(prefix);
+    console.log(data);
+
     if (data){
         res.status(200).json({ message: `Profile pic for user ${userId}`, data:data});
     } else {
@@ -189,7 +193,7 @@ router.post("/profile-pic-url", authenticateToken, async(req, res)=>{
 
     if (userId){
         const key = `${userId}/profile-pic/${fileName}`;
-        const data = await userProfileBucket.addProfilePic(key);
+        const data = await userBucket.addProfilePic(key);
         
         if (data){
             res.status(200).json({message: `Added profile pic for user ${userId}`, data: data});
@@ -207,7 +211,7 @@ router.delete("/profile-pic", authenticateToken, async(req, res)=>{
     const userId = localTranslatedToken.id;
     const key = `${userId}/profile-pic`;
 
-    const data = await userProfileBucket.deleteProfilePic(key);
+    const data = await userBucket.deleteProfilePic(key);
     if (data){
         res.status(200).json({message: `Deleted profile pic for user ${userId}`, data: data});
     } else {
