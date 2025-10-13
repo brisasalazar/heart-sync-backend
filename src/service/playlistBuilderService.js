@@ -36,6 +36,10 @@ async function populatePlaylist(playlistId, genre, artist, user_id) {
                 if (spotifyURI) spotifyURIs.push(spotifyURI);
             }
             
+            if (spotifyURIs.length == 0) {
+                return null;
+            }
+
             const shuffledURIs = shuffleArray(spotifyURIs);
 
             await addTracksToPlaylist(playlistId, shuffledURIs);
@@ -47,6 +51,9 @@ async function populatePlaylist(playlistId, genre, artist, user_id) {
             logger.error(`Error populating playlist in playlistBuilderService: ${error.message}`);
             return null;
         }
+    } else {
+        logger.error("Failed to validate playlist population");
+        return null;
     }
 }
 
@@ -86,9 +93,7 @@ async function getPlaylistByPlaylistId(user_id, playlistId) {
                     songSet.forEach(item => fullSongSet.add(item));
                 }
 
-                console.log(fullSongSet);
                 delete data.songIds;
-                //const mySet = new Set(['apple', 'banana', 'orange']);
                 data.tracksInfo = Array.from(fullSongSet);
 
             }
@@ -151,4 +156,4 @@ function shuffleArray(array) {
 
 //async function
 
-module.exports = { populatePlaylist, getPlaylistByPlaylistId, validatePopulatePlaylist }
+module.exports = { populatePlaylist, getPlaylistByPlaylistId, validatePopulatePlaylist, splitArray, shuffleArray, }
