@@ -1,5 +1,6 @@
 const axios = require("axios");
-const { getUser, getPlaylists, getTrackURI, getTokenInfo, refreshToken, addTracksToPlaylist } = require("../service/spotifyService.js");
+const { getUser, getPlaylists, getTrackURI, getTokenInfo, refreshToken, addTracksToPlaylist, getSpotifyPlaylistbyPlaylistId } = require("../service/spotifyService.js");
+const spotifyService = require("../service/spotifyService.js");
 const { getAuthHeaders } = require("../util/auth.js");
 const { logger } = require("../util/logger.js")
 
@@ -13,6 +14,12 @@ jest.mock("axios");
 
 // Mock logger
 jest.mock("../util/logger.js")
+
+// Mock Session Data
+jest.mock("../session/session.js", () => ({
+    accessToken: "mockedValue",
+}));
+const session = require("../session/session.js");
 
 describe("Spotify service layer", () => {
     beforeEach(() => {
@@ -80,7 +87,7 @@ describe("Spotify service layer", () => {
         test("should throw error if axios fails", async () => {
             axios.get.mockRejectedValue(new Error("error"));
 
-            const result = await getUser();
+            const result = await getPlaylists();
 
             expect(result).toBeNull();
             expect(logger.error).toHaveBeenCalledWith(new Error("error"))
@@ -318,4 +325,111 @@ describe("Spotify service layer", () => {
             expect(logger.error).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe("getSpotifyPlaylistbyPlaylistId function", () => {
+        test("successfully returns correct playlist", async () => {
+            const dummyPlaylistId = "3cEYpjA9oz9GiPac4AsH4n";
+            const mockSpotifyPlaylist = {
+                description: "A playlist for testing purpose",
+                id: "3cEYpjA9oz9GiPac4AsH4n",
+                tracks: [
+                    {
+                        id: "2pANdqPvxInB0YvcDiw4ko",
+                    }
+                ]
+
+            }
+            axios.get.mockResolvedValueOnce({data: mockSpotifyPlaylist});
+
+            const result = await getSpotifyPlaylistbyPlaylistId(dummyPlaylistId);
+
+            expect(result).toBe(mockSpotifyPlaylist);
+            expect(result.description).toBe("A playlist for testing purpose");
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(getAuthHeaders).toHaveBeenCalledTimes(1);
+        })
+
+        test("inputting the wrong playlistId will return null", async () => {
+            const dummyPlaylistId = "3cEYpjA9oz9GiPac4AsH4n";
+            axios.get.mockResolvedValueOnce(null);
+
+            const result = await getSpotifyPlaylistbyPlaylistId(dummyPlaylistId);
+            expect(result).toBeNull();
+            expect(axios.get).toHaveBeenCalledTimes(1);
+            expect(logger.error).toHaveBeenCalledTimes(1);
+        })
+    });
+
+    describe("createPlaylist function", () => {
+
+        test("Returns valid Id if inputs are valid", async () => {
+            
+
+            const dummyUserId = "dummyId";
+            const dummyName = "bikeriding playlist";
+            const dummyIsPublic = false;
+            const dummyIsCollaborative = false;
+            const dummyDescription = "This is a test description";
+            const dummyLocalUserId = "dummyLocalId";
+
+            const mockSpotifyPlaylist = {
+                description: "A playlist for testing purpose",
+                id: "3cEYpjA9oz9GiPac4AsH4n",
+                tracks: [
+                    {
+                        id: "2pANdqPvxInB0YvcDiw4ko",
+                    }
+                ]
+
+            }
+
+            axios.post.mockResolvedValueOnce({data: mockSpotifyPlaylist});
+            const createdPlaylistId = await spotifyService.createPlaylist(dummyUserId, dummyName, dummyIsPublic,
+                dummyIsCollaborative, dummyDescription, dummyLocalUserId);
+            
+            expect(createdPlaylistId).toBe(mockSpotifyPlaylist.id);
+            expect(axios.post).toHaveBeenCalledTimes(1);
+            expect(getAuthHeaders).toHaveBeenCalled();
+            
+        })
+        
+        test("Returns null if database creation fails", async () => {
+            axios.post.mockRejectedValueOnce({  
+                "error": {
+                    "status": 400,
+                    "message": "string"  
+                }
+            })
+
+            const dummyUserId = "dummyId";
+            const dummyName = "bikeriding playlist";
+            const dummyIsPublic = false;
+            const dummyIsCollaborative = false;
+            const dummyDescription = "This is a test description";
+            const dummyLocalUserId = "dummyLocalId";
+
+            const createdPlaylistId = await spotifyService.createPlaylist(dummyUserId, dummyName, dummyIsPublic, dummyIsCollaborative, dummyDescription, dummyLocalUserId);
+            expect(createdPlaylistId).toBeNull()
+            expect(logger.error).toHaveBeenCalledTimes(1);
+        })
+        
+        test("Returns null if session token is invalid", async () => {
+            session.accessToken = null;
+
+            const dummyUserId = "dummyId";
+            const dummyName = "bikeriding playlist";
+            const dummyIsPublic = false;
+            const dummyIsCollaborative = false;
+            const dummyDescription = "This is a test description";
+            const dummyLocalUserId = "dummyLocalId";
+
+            
+
+            const createdPlaylistId = await spotifyService.createPlaylist(dummyUserId, dummyName, dummyIsPublic, dummyIsCollaborative, dummyDescription, dummyLocalUserId);
+            expect(createdPlaylistId).toBeNull()
+            expect(logger.error).toHaveBeenCalledTimes(1);
+        })
+
+        
+    })
 });
