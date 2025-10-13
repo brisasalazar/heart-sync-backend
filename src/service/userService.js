@@ -292,17 +292,25 @@ async function validateUpdateUserPassword(user_id, oldPassword, newPassword) {
 
 async function validateUpdateUsername(user_id, oldUsername, newUsername) {
     if (!user_id || !oldUsername || !newUsername) {
-        logger.info(`Invalid Username Update Input`);
+        logger.error(`Invalid Username Update Input`);
         return null;
     } else if (oldUsername == newUsername){
-        logger.info(`Cannot replace Username with the same Username`);
+        logger.error(`Cannot replace Username with the same Username`);
         return null;
     }
 
     const userCheck = await getUserById(user_id);
     const newNameCheck = await getUserByUsername(newUsername);
 
-    return (userCheck && userCheck.username == oldUsername && !newNameCheck);
+    if (userCheck && userCheck.username == oldUsername && !newNameCheck) {
+        logger.info("Username Updating Request has been Validated");
+        return true;
+    } else {
+        logger.error("Invalid request");
+        return null;
+    }
+
+    //return (userCheck && userCheck.username == oldUsername && !newNameCheck);
 }
 
 async function validateAddFollowingUser(user_id, followingId) {
@@ -329,32 +337,32 @@ async function validateAddFollowingUser(user_id, followingId) {
 }
 
 // not in use
-async function validateAddUserToFollowersList(user_id, followingId) {
-    if (!user_id || !followingId || user_id == followingId) {
-        logger.info(`Invalid Followers List Update Input`);
-        return null;
-    }
+// async function validateAddUserToFollowersList(user_id, followingId) {
+//     if (!user_id || !followingId || user_id == followingId) {
+//         logger.info(`Invalid Followers List Update Input`);
+//         return null;
+//     }
 
-    const userCheck = await getUserById(user_id);
-    const followingCheck = await getUserById(followingId);
+//     const userCheck = await getUserById(user_id);
+//     const followingCheck = await getUserById(followingId);
 
-    // Because a set cannot contain duplicates we don't need to check wether or not the 
-    // other user's "followers" list contains the user_id
+//     // Because a set cannot contain duplicates we don't need to check wether or not the 
+//     // other user's "followers" list contains the user_id
 
-    if (!userCheck || !followingCheck) {
-        logger.info(`Non-existant User`);
-        return null;
-    }
+//     if (!userCheck || !followingCheck) {
+//         logger.info(`Non-existant User`);
+//         return null;
+//     }
 
-    let targetFollowersList = followingCheck?.followers;
+//     let targetFollowersList = followingCheck?.followers;
     
-    if (targetFollowersList && targetFollowersList.has(user_id)) {
-        logger.info(`Followers List already contains User's ID`);
-        return null;
-    }
+//     if (targetFollowersList && targetFollowersList.has(user_id)) {
+//         logger.info(`Followers List already contains User's ID`);
+//         return null;
+//     }
     
-    return true;
-}
+//     return true;
+// }
 
 async function validateUserDeletion(user_id, password) {
     if (!user_id || !password) {

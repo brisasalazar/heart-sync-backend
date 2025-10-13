@@ -2,6 +2,10 @@ jest.mock('../repository/userRepository');
 const userRepository = require('../repository/userRepository');
 const userService = require('../service/userService');
 
+const { logger } = require("../util/logger.js");
+jest.mock("../util/logger.js");
+
+
 describe("User Posting Suite", () => {
     beforeEach(() => {
         userRepository.postUser.mockReturnValue(null);
@@ -316,6 +320,83 @@ describe("User Update Password Suite", () => {
         const dummyNewPassword = "password1011$";
 
         const updatedUser = await userService.updateUserPassword(dummyUserId, dummyOldPassword, dummyNewPassword);
+        expect(updatedUser).toBeNull();
+    })
+})
+
+describe("User Update Username Suite", () => {
+    beforeEach(() => {
+        userRepository.getUserbyUserId.mockReturnValue(null);
+        userRepository.updateUserFields.mockReturnValue(null);
+    })
+
+    test("Updating a user's username returns an object with a correct new username", async () => {
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        userRepository.updateUserFields.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature909',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef"
+        const dummyOldUsername = "revature101";
+        const dummyNewUsername = "revature909";
+
+        const updatedUser = await userService.updateUsername(dummyUserId, dummyOldUsername, dummyNewUsername);
+        expect(userRepository.updateUserFields).toHaveBeenCalled();
+        expect(logger.info).toHaveBeenCalledTimes(4);
+        expect(updatedUser.username).toBe(dummyNewUsername);
+    })
+
+
+    test("Trying to update a user's username with an null username returns null", async () => {
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef"
+        const dummyOldUsername = "revature101";
+        const dummyNewUsername = "revature909";
+
+        const updatedUser = await userService.updateUsername(dummyUserId, dummyOldUsername, dummyNewUsername);
+        expect(logger.error).toHaveBeenCalled();
+        expect(updatedUser).toBeNull();
+    })
+
+    test("Updating a user's username with the same username doesn't work", async () => {
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef"
+        const dummyOldUsername = "revature101";
+        const dummyNewUsername = "revature101";
+
+        const updatedUser = await userService.updateUsername(dummyUserId, dummyOldUsername, dummyNewUsername);
+        expect(logger.error).toHaveBeenCalled();
+        expect(updatedUser).toBeNull();
+    })
+
+    test("Giving the wrong current username returns null", async () => {
+        userRepository.getUserbyUserId.mockReturnValue({
+            following:['user5dbd0e3b-6718-46ca-9867-f2df7765fea5'],
+            SK: 'METADATA',
+            password: '$2b$10$RZWpneGNmJjUsDjNWastAumap/NrDmqDvRzb3obROPTLMtZ4rjR4e',
+            username: 'revature101',
+            PK: 'USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef',
+            email: 'example@revature.net'
+        })
+
+        const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef"
+        const dummyOldUsername = "revature1011";
+        const dummyNewUsername = "revature909";
+
+        const updatedUser = await userService.updateUsername(dummyUserId, dummyOldUsername, dummyNewUsername);
+        //expect(userRepository.updateUserFields).toHaveBeenCalled();
+        expect(logger.error).toHaveBeenCalled();
         expect(updatedUser).toBeNull();
     })
 })
