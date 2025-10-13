@@ -139,11 +139,7 @@ describe("Playlist Builder service layer", () => {
             expect(getTracksByGenre).toHaveBeenCalledTimes(0);
             expect(getTracksByArtist).toHaveBeenCalledTimes(0);
             expect(getTrackURI).toHaveBeenCalledTimes(0);
-            expect(addTracksToPlaylist).toHaveBeenCalledTimes(1);
-            expect(addTracksToPlaylist).toHaveBeenCalledWith(
-                "playlistId",
-                expect.arrayContaining(Array(0).fill("SpotifyURI"))
-            );
+            expect(addTracksToPlaylist).toHaveBeenCalledTimes(0);
         });
 
         test("Returns null when playlist ID is not provided", async () => {

@@ -36,6 +36,10 @@ async function populatePlaylist(playlistId, genre, artist, user_id) {
                 if (spotifyURI) spotifyURIs.push(spotifyURI);
             }
             
+            if (spotifyURIs.length == 0) {
+                return spotifyURIs;
+            }
+
             const shuffledURIs = shuffleArray(spotifyURIs);
 
             await addTracksToPlaylist(playlistId, shuffledURIs);
@@ -47,6 +51,9 @@ async function populatePlaylist(playlistId, genre, artist, user_id) {
             logger.error(`Error populating playlist in playlistBuilderService: ${error.message}`);
             return null;
         }
+    } else {
+        logger.error("Cannot populate playlist without a genre AND an artist");
+        return [];
     }
 }
 
