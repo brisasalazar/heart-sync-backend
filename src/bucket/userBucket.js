@@ -25,45 +25,26 @@ async function getProfilePic(key){
     }
 };
 
-// getProfilePic("brisasalazar/Brisita-86.jpeg");
 
-async function addProfilePic(filePath, key){
-    console.log(filePath);
-    try {
-        if (!fs.existsSync(filePath)) {
-            logger.error(`File does not exist: ${filePath}`);
-            return null;
-        }
-        
-        fileBuffer = fs.readFileSync(filePath);
-        logger.info(`Successfully read file: ${filePath}, size: ${fileBuffer.length} bytes`);
-        
-    } catch (fileError) {
-        logger.error(`Failed to read file: ${filePath}`, fileError);
-        return null;
-    }
+async function addProfilePic(key){
 
     const command = new PutObjectCommand({
                 Bucket: bucketName, 
-                Body: fileBuffer,
+                //Body: fileBuffer,
                 Key: key,
                 ContentType: "image/jpeg",
             });
 
     try{
-        const response = await client.send(command);
-        logger.info("PUT Object Command successful", response);
-        return response;
+        const signedURL = await getSignedUrl(client, command, {expiresIn:3600});
+        logger.info("PUT Object Command URL successful", signedURL);
+        return signedURL;
     } catch (err){
-        logger.error("Failed PUT Object Command.", err);
+        logger.error("Failed PUT Object Command URL", err);
         return null;
     }
 };
 
-// addProfilePic(
-//     "/Users/brisasalazar/Library/Mobile Documents/com~apple~CloudDocs/Downloads/Brisita-86.jpeg",
-//     "brisasalazar/Brisita-86.jpeg"  
-// );
 
 async function deleteProfilePic(key){
     const command = new DeleteObjectCommand({
@@ -80,6 +61,5 @@ async function deleteProfilePic(key){
     }
 };
 
-// deleteProfilePic("brisasalazar/Brisita-86.jpeg");
 
 module.exports = {getProfilePic, addProfilePic, deleteProfilePic};

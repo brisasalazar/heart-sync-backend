@@ -180,23 +180,16 @@ router.get("/:userId/profile-pic", authenticateToken, validateUser, async(req, r
     }
 })
 
-router.post("/profile-pic", authenticateToken, async(req, res)=>{
-    const filePath = req.body.filePath;
-    
-    if (!filePath) {
-        return res.status(400).json({message: "filePath is required in request body"});
-    }
+router.post("/profile-pic-url", authenticateToken, async(req, res)=>{
+    const {fileName} = req.body;
 
     const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
     const userId = localTranslatedToken.id;
     console.log(userId);
 
     if (userId){
-        const key = `${userId}/profile-pic`;
-
-        console.log(`Attempting to upload profile pic - FilePath: ${filePath}, Key: ${key}`);
-
-        const data = await userProfileBucket.addProfilePic(filePath, key);
+        const key = `${userId}/profile-pic/${fileName}`;
+        const data = await userProfileBucket.addProfilePic(key);
         
         if (data){
             res.status(200).json({message: `Added profile pic for user ${userId}`, data: data});
