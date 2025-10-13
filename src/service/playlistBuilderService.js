@@ -52,8 +52,8 @@ async function populatePlaylist(playlistId, genre, artist, user_id) {
             return null;
         }
     } else {
-        logger.error("Cannot populate playlist without a genre AND an artist");
-        return [];
+        logger.error("Failed to validate playlist population");
+        return null;
     }
 }
 
@@ -149,6 +149,10 @@ function splitArray(arr, k) {
 }
 
 function shuffleArray(array) {
+    if (array.length == 0) {
+        return [];
+    }
+
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]]; // Swap elements
@@ -158,4 +162,4 @@ function shuffleArray(array) {
 
 //async function
 
-module.exports = { populatePlaylist, getPlaylistByPlaylistId, validatePopulatePlaylist }
+module.exports = { populatePlaylist, getPlaylistByPlaylistId, validatePopulatePlaylist, splitArray, shuffleArray, }

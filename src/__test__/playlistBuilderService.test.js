@@ -37,6 +37,9 @@ const playlistRepository = require("../repository/playlistRepository.js");
 jest.mock("../service/userService.js");
 const userService = require("../service/userService.js");
 
+jest.mock("../service/lastFMService.js")
+const lastFMService = require("../service/lastFMService.js");
+
 jest.mock("../session/session.js", () => ({
     accessToken: "mockedValue",
 }));
@@ -130,8 +133,15 @@ describe("Playlist Builder service layer", () => {
 
         test("Successfully returns an empty list of Spotify URIs when no genre/artist is given", async () => {
             // Arrange
+            playlistRepository.getPlaylistbyPlaylistId.mockReturnValue(VALID_PLAYLIST);
+            userService.getUserById.mockReturnValue(VALID_USER);
+            lastFMService.getTracksByGenre.mockReturnValue(null);
+            lastFMService.getTracksByArtist.mockReturnValue(null);
+            const dummyUserId = "dummyId";
+
             // Act
-            const spotifyURIs = await populatePlaylist("playlistId");
+            const spotifyURIs = await populatePlaylist("playlistId", null, null, dummyUserId);
+            console.log(spotifyURIs);
 
             // Assert
             expect(spotifyURIs).toHaveLength(0);
@@ -144,6 +154,9 @@ describe("Playlist Builder service layer", () => {
 
         test("Returns null when playlist ID is not provided", async () => {
             // Arrange
+            playlistRepository.getPlaylistbyPlaylistId.mockReturnValue(VALID_PLAYLIST);
+
+            userService.getUserById.mockReturnValue(VALID_USER);
             // Act
             const spotifyURIs = await populatePlaylist("", "genre", "artistName");
 
@@ -342,3 +355,23 @@ describe("validatePopulatePlaylist Suite", () => {
         
     // })
 })
+
+describe("helper functions suite", () => {
+    test("split Array function", () => {
+        const dummyArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+        const result = playlistBuilderService.splitArray(dummyArray, 5);
+
+        expect(result.length).toBe(2);
+        expect(result[0]).toStrictEqual([1,2,3,4,5]);
+    });
+
+    test("shuffle array function", () => {
+        const dummyArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+        const result = playlistBuilderService.shuffleArray(dummyArray);
+
+        expect(result.length).toBe(dummyArray.length);
+        expect(result.sort()).toEqual(dummyArray.sort());
+    })
+});
