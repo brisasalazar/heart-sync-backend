@@ -37,7 +37,7 @@ async function populatePlaylist(playlistId, genre, artist, user_id) {
             }
             
             if (spotifyURIs.length == 0) {
-                return spotifyURIs;
+                return null;
             }
 
             const shuffledURIs = shuffleArray(spotifyURIs);
@@ -93,9 +93,7 @@ async function getPlaylistByPlaylistId(user_id, playlistId) {
                     songSet.forEach(item => fullSongSet.add(item));
                 }
 
-                console.log(fullSongSet);
                 delete data.songIds;
-                //const mySet = new Set(['apple', 'banana', 'orange']);
                 data.tracksInfo = Array.from(fullSongSet);
 
             }
@@ -149,10 +147,6 @@ function splitArray(arr, k) {
 }
 
 function shuffleArray(array) {
-    if (array.length == 0) {
-        return [];
-    }
-
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]]; // Swap elements

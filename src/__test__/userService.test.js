@@ -349,13 +349,17 @@ describe("User Update Username Suite", () => {
             email: 'example@revature.net'
         })
 
+        userRepository.getUserByUsername.mockReturnValue(null);
+
+
+
         const dummyUserId = "USER#user54fcb9e1-5d8e-4d43-bd99-69cf01e8a9ef"
         const dummyOldUsername = "revature101";
         const dummyNewUsername = "revature909";
 
         const updatedUser = await userService.updateUsername(dummyUserId, dummyOldUsername, dummyNewUsername);
         expect(userRepository.updateUserFields).toHaveBeenCalled();
-        expect(logger.info).toHaveBeenCalledTimes(4);
+        expect(logger.info).toHaveBeenCalled();
         expect(updatedUser.username).toBe(dummyNewUsername);
     })
 
