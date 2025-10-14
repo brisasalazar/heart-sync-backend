@@ -207,7 +207,7 @@ describe("Post Service Tests", () => {
         const dummyUser = {
             username: "user",
             PK: "USER#1748",
-            usr_following: ["123", "145"]
+            following: ["123", "145"]
         };
 
         const dummyUserPosts = [
