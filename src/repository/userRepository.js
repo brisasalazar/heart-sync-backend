@@ -124,9 +124,15 @@ async function getUserByUsername(username) {
     // This will work for now, but it is not the most efficient way possible
     const command = new ScanCommand({
         TableName,
-        FilterExpression: "#username = :username",
-        ExpressionAttributeNames: {"#username": "username"},
-        ExpressionAttributeValues: {":username": username}
+        FilterExpression: "#username = :username AND #SK = :METADATA",
+        ExpressionAttributeNames: {
+            "#username": "username",
+            "#SK": "SK"
+        },
+        ExpressionAttributeValues: {
+            ":username": username,
+            ":METADATA": "METADATA"
+        }
     });
 
     try{
