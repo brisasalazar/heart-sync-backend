@@ -89,7 +89,12 @@ async function updateUsername(user_id, oldUsername, newUsername) {
     }
 }
 
-async function addFollowingUser(user_id, followingId) {
+async function addFollowingUser(user_id, followingUsername) {
+    const followingUser = await getUserByUsername(followingUsername);
+    console.log(followingUser);
+    const followingId = followingUser.PK;
+    console.log(followingId);
+
     if (await validateAddFollowingUser(user_id, followingId)) {
         // check to see if the following list exists
         const currentUser = await getUserById(user_id);

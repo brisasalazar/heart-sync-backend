@@ -41,6 +41,22 @@ router.get("/profile/:userId", async (req, res) => {
     }
 });
 
+router.get("/profile/username/:username", async (req, res) => {
+    const { username } = req.params;
+
+    try {
+        const data = await userService.getUserByUsername(username);
+        if (data) {
+            res.status(200).json({ message: `Profile for user ${username}`, data: data });
+        } else {
+            res.status(404).json({ message: `User not found` });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: `Server error retrieving profile` });
+    }
+});
+
 // User Posting Route
 router.post("/", validatePostUser, async (req, res) => {
     const data = await userService.postUser(req.body);
@@ -125,11 +141,11 @@ router.put("/username", validateLoginStatus, async (req, res) => {
 })
 
 router.put("/following", validateLoginStatus, async (req, res) => {
-    const { followingId } = req.body;
+    const { followingUsername } = req.body;
 
     const localTranslatedToken = await decodeJWT(req.headers['authorization'].split(" ")[1]);
 
-    const data = await userService.addFollowingUser(localTranslatedToken.id, followingId);
+    const data = await userService.addFollowingUser(localTranslatedToken.id, followingUsername);
     if (data) {
         res.status(201).json({ message: "User following list has been updated successfully", data: data });
     } else {
