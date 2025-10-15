@@ -23,6 +23,7 @@ app.use(
   })
 );
 
+
 const PORT = 3001;
 
 app.use(bodyParser.json());
@@ -37,11 +38,11 @@ app.use("/last-fm", lastFMController);
 app.use("/playlist-builder", playlistBuilderController);
 
 app.get("/", (req, res) => {
-    res.send("Home Page");
+  res.send("Home Page");
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is listening on http://localhost:${PORT}`);
+  console.log(`Server is listening on http://localhost:${PORT}`);
 })
 
 
