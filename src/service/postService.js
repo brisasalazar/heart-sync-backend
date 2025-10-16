@@ -19,8 +19,13 @@ async function getUserFeed(userID){
     try{
         const user = await userService.getUserById(userID);
     
-        const followingList = user.following; 
+        const followingList = user?.following; 
         const feed = []
+
+        if (!followingList) {
+            return feed;
+        }
+
         for (var user_id of followingList){
             const data = await postRepository.getPostsFromUser(user_id);
             if(data){
