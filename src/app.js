@@ -15,14 +15,14 @@ const playlistBuilderController = require("./controller/playlistBuilderControlle
 
 require('dotenv').config();
 
-// app.use(cors());
-app.use(
-  cors({
-    //origin: "http://localhost:5173",
-    origin:"http://heartsync-frontend-pipeline.s3-website-us-east-1.amazonaws.com",
-    credentials: true,
-  })
-);
+app.use(cors());
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173",
+//     //origin:"http://heartsync-frontend-pipeline.s3-website-us-east-1.amazonaws.com",
+//     credentials: true,
+//   })
+// );
 
 
 const PORT = 3001;
