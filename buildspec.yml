@@ -18,7 +18,7 @@ phases:
       - echo `API_BASE_URL=${API_BASE_URL}` >> .env
 
       - echo "LASTFM_API_KEY=$(aws --region=us-east-1 ssm get-parameter --name "LASTFM_API_KEY" --with-decryption --output text --query Parameter.Value)" >> .env
-      - echo "LASTFM_SHARED_SECRET=$(aws --region=us-east-1 ssm get-parameter --name "LASTFM_SHARED_SECRET" --with-decryption --output text --query Parameter.Value)" >> .env
+      - echo "LASTFM_SHARED_SECRET=$(aws --region=us-east-1 ssm get-parameter --name "LAST_FM_SHARED_SECRET" --with-decryption --output text --query Parameter.Value)" >> .env
       - echo `LASTFM_API_BASE_URL=${LASTFM_API_BASE_URL}` >> .env
       
 artifacts:
