@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
   res.send("Home Page");
 });
 
-app.listen(PORT,"0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`Server is listening on http://localhost:${PORT}`);
 })
 
