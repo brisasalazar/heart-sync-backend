@@ -32,7 +32,7 @@ spotifyController.get("/callback", async (req, res) => {
     session.refreshToken = tokenInfo["refresh_token"];
     session.expiresAt = Date.now() + tokenInfo["expires_in"];
 
-    const redirectURL = `http://localhost:5173/spotify-success?accessToken=${session.accessToken}`
+    const redirectURL = `http://heartsync-frontend-pipeline.s3-website-us-east-1.amazonaws.com/spotify-success?accessToken=${session.accessToken}`
     res.redirect(redirectURL);
 })
 
