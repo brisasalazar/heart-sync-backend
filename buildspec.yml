@@ -14,7 +14,7 @@ env:
     - LASTFM_API_BASE_URL
 phases:
   buid:
-    commads:
+    commands:
       - export CLIENT_SECRET="9f376775293c4dccb5b3ff621a4821dc"
       - export CLIENT_ID="5ab34e587e6347e293017038e27f5f98"
       - export REDIRECT_URI="http://127.0.0.1:3001/spotify/callback"
