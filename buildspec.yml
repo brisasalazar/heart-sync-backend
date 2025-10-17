@@ -1,31 +1,5 @@
 version: 0.2
-env:
-  exported-variables:
-    - CLIENT_ID
-    - CLIENT_SECRET
-    - REDIRECT_URI
-
-    - AUTH_URL
-    - TOKEN_URL
-    - API_BASE_URL
-
-    - LASTFM_API_KEY
-    - LASTFM_API_SHARED_SECRET
-    - LASTFM_API_BASE_URL
 phases:
-  build:
-    commands:
-      - export CLIENT_SECRET="9f376775293c4dccb5b3ff621a4821dc"
-      - export CLIENT_ID="5ab34e587e6347e293017038e27f5f98"
-      - export REDIRECT_URI="http://127.0.0.1:3001/spotify/callback"
-
-      - export AUTH_URL="https://accounts.spotify.com/authorize"
-      - export TOKEN_URL="https://accounts.spotify.com/api/token"
-      - export API_BASE_URL="https://api.spotify.com/v1/"
-
-      - export LASTFM_API_KEY="01b9e4a817607956e0c76b6daca34b38"
-      - export LASTFM_API_SHARED_SECRET="483c686505d8f6edd526c5852b11d347"
-      - export LASTFM_API_BASE_URL="http://ws.audioscrobbler.com/2.0"
   install:
     runtime-versions:
       nodejs: 18
