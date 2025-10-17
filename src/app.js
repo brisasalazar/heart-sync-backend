@@ -6,14 +6,14 @@ const bodyParser = require("body-parser");
 const { logger, loggerMiddleware } = require('./util/logger');
 const { authenticateToken } = require("./util/jwt");
 
+require('dotenv').config();
+
 // import the necessary functions from the user controller
 const userController = require("./controller/userController");
 const postController = require("./controller/postController");
 const spotifyController = require("./controller/spotifyController");
 const lastFMController = require("./controller/lastFMController");
 const playlistBuilderController = require("./controller/playlistBuilderController");
-
-require('dotenv').config();
 
 app.use(cors());
 // app.use(
