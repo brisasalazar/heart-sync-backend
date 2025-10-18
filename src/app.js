@@ -1,3 +1,6 @@
+
+require('dotenv').config({ path: '/home/ubuntu/heart-sync-backend/.env' });
+
 // imports 
 const express = require("express");
 const cors = require("cors");
@@ -6,7 +9,6 @@ const bodyParser = require("body-parser");
 const { logger, loggerMiddleware } = require('./util/logger');
 const { authenticateToken } = require("./util/jwt");
 
-require('dotenv').config();
 
 // import the necessary functions from the user controller
 const userController = require("./controller/userController");
