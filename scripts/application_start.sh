@@ -11,4 +11,4 @@ else
     exit 1
 fi
 
-node src/app.js > /dev/null 2>&1 &
+npm run start > /dev/null 2>&1 &
