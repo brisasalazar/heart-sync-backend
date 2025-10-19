@@ -34,8 +34,9 @@ spotifyController.get("/callback", async (req, res) => {
     const code = req.query.code;
 
     const tokenInfo = await getTokenInfo(code);
-    
+
     if (!tokenInfo || !tokenInfo.access_token) {
+        console.log("unable to get spotify acces token");
     return res.status(400).send("Failed to get Spotify access token");
 }
 
