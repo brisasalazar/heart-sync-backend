@@ -24,6 +24,7 @@ spotifyController.get("/login", (req, res) => {
         "show_dialog": true
     })
 
+    console.log(params);
     const authUrl = `https://accounts.spotify.com/authorize?${params.toString()}`
     console.log(authUrl);
     res.redirect(authUrl);
