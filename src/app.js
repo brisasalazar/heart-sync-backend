@@ -1,5 +1,5 @@
 
-require('dotenv').config({ path: '/home/ubuntu/heart-sync-backend/.env' });
+require('dotenv').config();
 
 // imports 
 const express = require("express");
