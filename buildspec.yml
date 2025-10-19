@@ -25,15 +25,15 @@ phases:
 
       - echo "CLIENT_ID=$(aws --region=us-east-1 ssm get-parameter --name "CLIENT_ID" --with-decryption --output text --query Parameter.Value)" >> .env
       - echo "CLIENT_SECRET=$(aws --region=us-east-1 ssm get-parameter --name "CLIENT_SECRET" --with-decryption --output text --query Parameter.Value)" >> .env
-      - echo "REDIRECT_URI=${REDIRECT_URI}" >> .env
+      - echo "REDIRECT_URI=$(aws --region=us-east-1 ssm get-parameter --name "REDIRECT_URI" --with-decryption --output text --query Parameter.Value)" >> .env
 
-      - echo "AUTH_URL=${AUTH_URL}" >> .env
-      - echo "TOKEN_URL=${TOKEN_URL}" >> .env
-      - echo "API_BASE_URL=${API_BASE_URL}" >> .env
+      - echo "AUTH_URL=$(aws --region=us-east-1 ssm get-parameter --name "AUTH_URL" --with-decryption --output text --query Parameter.Value)" >> .env
+      - echo "TOKEN_URL=$(aws --region=us-east-1 ssm get-parameter --name "TOKEN_URL" --with-decryption --output text --query Parameter.Value)" >> .env
+      - echo "API_BASE_URL=$(aws --region=us-east-1 ssm get-parameter --name "API_BASE_URL" --with-decryption --output text --query Parameter.Value)" >> .env
 
       - echo "LASTFM_API_KEY=$(aws --region=us-east-1 ssm get-parameter --name "LASTFM_API_KEY" --with-decryption --output text --query Parameter.Value)" >> .env
       - echo "LASTFM_SHARED_SECRET=$(aws --region=us-east-1 ssm get-parameter --name "LAST_FM_SHARED_SECRET" --with-decryption --output text --query Parameter.Value)" >> .env
-      - echo "LASTFM_API_BASE_URL=${LASTFM_API_BASE_URL}" >> .env
+      - echo "LASTFM_API_BASE_URL=$(aws --region=us-east-1 ssm get-parameter --name "LASTFM_API_BASE_URL" --with-decryption --output text --query Parameter.Value)" >> .env
       
 artifacts:
   files:

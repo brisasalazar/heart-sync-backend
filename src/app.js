@@ -12,11 +12,12 @@ const { authenticateToken } = require("./util/jwt");
 console.log("CLIENT_ID:", process.env.CLIENT_ID);
 console.log("REDIRECT_URI:", process.env.REDIRECT_URL);
 console.log("AUTH_URL:", process.env.AUTH_URL);
-// console.log("AUTH_URL:", process.env.AUTH_URL);
-// console.log("AUTH_URL:", process.env.AUTH_URL);
-// console.log("AUTH_URL:", process.env.AUTH_URL);
-
-
+console.log("CLIENT_SECRET:", process.env.CLIENT_SECRET);
+console.log("TOKEN_URL:", process.env.TOKEN_URL);
+console.log("API_BASE_URL:", process.env.API_BASE_URL);
+console.log("LASTFM_API_KEY:", process.env.LASTFM_API_KEY);
+console.log("LASTFM_SHARED_SECRET:", process.env.LASTFM_SHARED_SECRET);
+console.log("LASTFM_API_BASE_URL:", process.env.LASTFM_API_BASE_URL);
 // import the necessary functions from the user controller
 const userController = require("./controller/userController");
 const postController = require("./controller/postController");
