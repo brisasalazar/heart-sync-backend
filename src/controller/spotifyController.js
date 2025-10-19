@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const { getUser, getTokenInfo, refreshToken, getPlaylists, getSpotifyPlaylistbyPlaylistId, createPlaylist, getTrackURI, addTracksToPlaylist } = require("../service/spotifyService.js");
 let session = require("../session/session.js");
