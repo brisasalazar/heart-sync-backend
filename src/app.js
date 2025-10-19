@@ -18,6 +18,7 @@ console.log("API_BASE_URL:", process.env.API_BASE_URL);
 console.log("LASTFM_API_KEY:", process.env.LASTFM_API_KEY);
 console.log("LASTFM_SHARED_SECRET:", process.env.LASTFM_SHARED_SECRET);
 console.log("LASTFM_API_BASE_URL:", process.env.LASTFM_API_BASE_URL);
+
 // import the necessary functions from the user controller
 const userController = require("./controller/userController");
 const postController = require("./controller/postController");
@@ -53,7 +54,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is listening on http://54.144.230.212:${PORT}`);
+  console.log(`Server is listening on http://127.0.0.1:${PORT}`);
 })
 
 
