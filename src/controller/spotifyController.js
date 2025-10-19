@@ -20,7 +20,7 @@ spotifyController.get("/login", (req, res) => {
         "client_id": "5ab34e587e6347e293017038e27f5f98",
         "response_type": "code",
         "scope": scope,
-        "redirect_uri": "http://34.229.0.93:3001/spotify/callback",
+        "redirect_uri": "http://34.229.0.93:3001/spotify/callback", 
         "show_dialog": true
     })
 
@@ -34,6 +34,10 @@ spotifyController.get("/callback", async (req, res) => {
     const code = req.query.code;
 
     const tokenInfo = await getTokenInfo(code);
+    
+    if (!tokenInfo || !tokenInfo.access_token) {
+    return res.status(400).send("Failed to get Spotify access token");
+}
 
     session.accessToken = tokenInfo["access_token"];
     session.refreshToken = tokenInfo["refresh_token"];
