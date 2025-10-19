@@ -25,7 +25,7 @@ async function getTokenInfo(code) {
             "code": code,
             "grant_type": "authorization_code",
             "redirect_uri": "http://34.229.0.93:3001/spotify/callback",
-            "client_id": client_id,
+            "client_id": process.env.CLIENT_ID,
             "client_secret": "9f376775293c4dccb5b3ff621a4821dc"
         });
 
