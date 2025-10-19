@@ -1,28 +1,28 @@
 version: 0.2
-# env:
-#   exported-variables:
-#     - PORT
-#     - CLIENT_ID
-#     - CLIENT_SECRET
-#     - REDIRECT_URI
+env:
+  variables:
+    #  - PORT
+    # # - CLIENT_ID
+    # # - CLIENT_SECRET
+    #  - REDIRECT_URI
 
-#     - AUTH_URL
-#     - TOKEN_URL
-#     - API_BASE_URL
+    # - AUTH_URL
+    # - TOKEN_URL
+    # - API_BASE_URL
 
-#     - LASTFM_API_KEY
-#     - LASTFM_SHARED_SECRET
-#     - LASTFM_API_BASE_URL
+    # - LASTFM_API_KEY
+    # - LASTFM_SHARED_SECRET
+    # - LASTFM_API_BASE_URL
 phases:
   install:
     runtime-versions:
       nodejs: 18
     commands:
       - npm install
-  build:
+  pre-build:
     commands: 
-      - echo "PORT=$(PORT)" >> .env
-      - echo "REDIRECT_URI=$(REDIRECT_URI)" >> .env
+      - echo PORT=${PORT} >> .env
+      - echo REDIRECT_URI=${REDIRECT_URI} >> .env
 
       - echo "CLIENT_ID=$(aws --region=us-east-1 ssm get-parameter --name "CLIENT_ID" --with-decryption --output text --query Parameter.Value)" >> .env
       - echo "CLIENT_SECRET=$(aws --region=us-east-1 ssm get-parameter --name "CLIENT_SECRET" --with-decryption --output text --query Parameter.Value)" >> .env
