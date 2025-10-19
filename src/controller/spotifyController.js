@@ -9,8 +9,8 @@ const { getPlaylistbyPlaylistId } = require("../repository/playlistRepository.js
 
 const spotifyController = express.Router();
 
-console.log("CLIENT_ID:", process.env.CLIENT_ID);
-console.log("REDIRECT_URI:", process.env.REDIRECT_URI);
+console.log("CLIENT_ID:", "5ab34e587e6347e293017038e27f5f98");
+console.log("REDIRECT_URI:", "http://34.229.0.93:3001/spotify/callback");
 console.log("AUTH_URL:", process.env.AUTH_URL);
 
 spotifyController.get("/login", (req, res) => {
@@ -20,11 +20,11 @@ spotifyController.get("/login", (req, res) => {
         "client_id": "5ab34e587e6347e293017038e27f5f98",
         "response_type": "code",
         "scope": scope,
-        "redirect_uri": process.env.REDIRECT_URI,
+        "redirect_uri": "http://34.229.0.93:3001/spotify/callback",
         "show_dialog": true
     })
 
-    const authUrl = `${process.env.AUTH_URL}?${params.toString()}`
+    const authUrl = `https://accounts.spotify.com/authorize?${params.toString()}`
     console.log(authUrl);
     res.redirect(authUrl);
 })

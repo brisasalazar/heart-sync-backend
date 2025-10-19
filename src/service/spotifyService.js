@@ -5,6 +5,9 @@ const {logger} = require("../util/logger.js");
 
 const session = require("../session/session");
 
+const client_id="5ab34e587e6347e293017038e27f5f98";
+const redirect_uri="http://34.229.0.93:3001/spotify/callback";
+const client_secret="9f376775293c4dccb5b3ff621a4821dc";
 
 async function getUser() {
     try{
@@ -21,9 +24,9 @@ async function getTokenInfo(code) {
         const params = new URLSearchParams({
             "code": code,
             "grant_type": "authorization_code",
-            "redirect_uri": process.env.REDIRECT_URI,
-            "client_id": process.env.CLIENT_ID,
-            "client_secret": process.env.CLIENT_SECRET
+            "redirect_uri": "http://34.229.0.93:3001/spotify/callback",
+            "client_id": client_id,
+            "client_secret": "9f376775293c4dccb5b3ff621a4821dc"
         });
 
         const response = await axios.post(process.env.TOKEN_URL, params.toString(), {
@@ -45,8 +48,8 @@ async function refreshToken(session) {
         const params = new URLSearchParams({
             "grant_type": "refresh_token",
             "refresh_token": session.refreshToken,
-            "client_id": process.env.CLIENT_ID,
-            "client_secret": process.env.CLIENT_SECRET
+            "client_id": "5ab34e587e6347e293017038e27f5f98",
+            "client_secret": "9f376775293c4dccb5b3ff621a4821dc"
         })
 
         const response = await axios.post(process.env.TOKEN_URL, params.toString());
