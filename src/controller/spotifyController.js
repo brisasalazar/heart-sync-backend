@@ -20,7 +20,7 @@ spotifyController.get("/login", (req, res) => {
         "client_id": process.env.CLIENT_ID,
         "response_type": "code",
         "scope": scope,
-        "redirect_uri": "http://34.229.0.93:3001/spotify/callback", 
+        "redirect_uri": process.env.REDIRECT_URI, 
         "show_dialog": true
     })
 

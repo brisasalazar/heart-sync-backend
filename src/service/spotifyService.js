@@ -5,9 +5,7 @@ const {logger} = require("../util/logger.js");
 
 const session = require("../session/session");
 
-const client_id="process.env.CLIENT_ID";
-const redirect_uri="http://34.229.0.93:3001/spotify/callback";
-const client_secret="9f376775293c4dccb5b3ff621a4821dc";
+
 
 async function getUser() {
     try{
