@@ -7,12 +7,13 @@ const { getPlaylistbyPlaylistId } = require("../repository/playlistRepository.js
 
 const spotifyController = express.Router();
 
+ console.log("CLIENT_ID:", process.env.CLIENT_ID);
+console.log("REDIRECT_URI:", process.env.REDIRECT_URI);
+console.log("AUTH_URL:", process.env.AUTH_URL);
+
 spotifyController.get("/login", (req, res) => {
     const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
-    console.log("CLIENT_ID:", process.env.CLIENT_ID);
-    console.log("REDIRECT_URI:", process.env.REDIRECT_URI);
-    console.log("AUTH_URL:", process.env.AUTH_URL);
-    
+
     const params = new URLSearchParams({
         "client_id": process.env.CLIENT_ID,
         "response_type": "code",
