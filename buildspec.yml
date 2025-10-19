@@ -19,12 +19,12 @@ phases:
       nodejs: 18
     commands:
       - npm install
-  # pre_build:
-  #   commands: 
-  #     - echo PORT=${PORT} >> .env
-  #     - echo REDIRECT_URI=${REDIRECT_URI} >> .env
+  pre_build:
+    commands: 
+      - echo PORT=${PORT} >> .env
+      - echo REDIRECT_URI=${REDIRECT_URI} >> .env
 
-  #     - echo "CLIENT_ID=$(aws --region=us-east-1 ssm get-parameter --name "CLIENT_ID" --with-decryption --output text --query Parameter.Value)" >> .env
+      - echo "CLIENT_ID=$(aws --region=us-east-1 ssm get-parameter --name "CLIENT_ID" --with-decryption --output text --query Parameter.Value)" >> .env
   #     - echo "CLIENT_SECRET=$(aws --region=us-east-1 ssm get-parameter --name "CLIENT_SECRET" --with-decryption --output text --query Parameter.Value)" >> .env
   #    # - echo "REDIRECT_URI=$(aws --region=us-east-1 ssm get-parameter --name "REDIRECT_URI" --with-decryption --output text --query Parameter.Value)" >> .env
 

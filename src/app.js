@@ -9,7 +9,7 @@ const bodyParser = require("body-parser");
 const { logger, loggerMiddleware } = require('./util/logger');
 const { authenticateToken } = require("./util/jwt");
 
-console.log("CLIENT_ID:", "5ab34e587e6347e293017038e27f5f98");
+console.log("CLIENT_ID:", process.env.CLIENT_ID);
 console.log("REDIRECT_URI:", "http://34.229.0.93:3001/spotify/callback");
 console.log("AUTH_URL:", process.env.AUTH_URL);
 console.log("CLIENT_SECRET:", "9f376775293c4dccb5b3ff621a4821dc");

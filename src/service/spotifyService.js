@@ -5,7 +5,7 @@ const {logger} = require("../util/logger.js");
 
 const session = require("../session/session");
 
-const client_id="5ab34e587e6347e293017038e27f5f98";
+const client_id="process.env.CLIENT_ID";
 const redirect_uri="http://34.229.0.93:3001/spotify/callback";
 const client_secret="9f376775293c4dccb5b3ff621a4821dc";
 
@@ -48,7 +48,7 @@ async function refreshToken(session) {
         const params = new URLSearchParams({
             "grant_type": "refresh_token",
             "refresh_token": session.refreshToken,
-            "client_id": "5ab34e587e6347e293017038e27f5f98",
+            "client_id": process.env.CLIENT_ID,
             "client_secret": "9f376775293c4dccb5b3ff621a4821dc"
         })
 
