@@ -6,7 +6,6 @@ const {logger} = require("../util/logger.js");
 const session = require("../session/session");
 
 
-
 async function getUser() {
     try{
         const response = await axios.get(process.env.API_BASE_URL + "me", { headers: getAuthHeaders() });
@@ -22,9 +21,9 @@ async function getTokenInfo(code) {
         const params = new URLSearchParams({
             "code": code,
             "grant_type": "authorization_code",
-            "redirect_uri": "http://34.229.0.93:3001/spotify/callback",
+            "redirect_uri": process.env.REDIRECT_URI,
             "client_id": process.env.CLIENT_ID,
-            "client_secret": "9f376775293c4dccb5b3ff621a4821dc"
+            "client_secret": process.env.CLIENT_SECRET
         });
 
         const response = await axios.post(process.env.TOKEN_URL, params.toString(), {
@@ -47,7 +46,7 @@ async function refreshToken(session) {
             "grant_type": "refresh_token",
             "refresh_token": session.refreshToken,
             "client_id": process.env.CLIENT_ID,
-            "client_secret": "9f376775293c4dccb5b3ff621a4821dc"
+            "client_secret": process.env.CLIENT_SECRET
         })
 
         const response = await axios.post(process.env.TOKEN_URL, params.toString());

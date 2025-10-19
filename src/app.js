@@ -10,9 +10,9 @@ const { logger, loggerMiddleware } = require('./util/logger');
 const { authenticateToken } = require("./util/jwt");
 
 console.log("CLIENT_ID:", process.env.CLIENT_ID);
-console.log("REDIRECT_URI:", "http://34.229.0.93:3001/spotify/callback");
+console.log("REDIRECT_URI:", process.env.REDIRECT_URI);
 console.log("AUTH_URL:", process.env.AUTH_URL);
-console.log("CLIENT_SECRET:", "9f376775293c4dccb5b3ff621a4821dc");
+console.log("CLIENT_SECRET:", process.env.CLIENT_SECRET);
 console.log("TOKEN_URL:", process.env.TOKEN_URL);
 console.log("API_BASE_URL:", process.env.API_BASE_URL);
 console.log("LASTFM_API_KEY:", process.env.LASTFM_API_KEY);
