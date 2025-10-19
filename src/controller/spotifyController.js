@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config("home/ubuntu/heart-sync-backend/.env");
 
 const express = require("express");
 const { getUser, getTokenInfo, refreshToken, getPlaylists, getSpotifyPlaylistbyPlaylistId, createPlaylist, getTrackURI, addTracksToPlaylist } = require("../service/spotifyService.js");
@@ -9,7 +9,7 @@ const { getPlaylistbyPlaylistId } = require("../repository/playlistRepository.js
 
 const spotifyController = express.Router();
 
- console.log("CLIENT_ID:", process.env.CLIENT_ID);
+console.log("CLIENT_ID:", process.env.CLIENT_ID);
 console.log("REDIRECT_URI:", process.env.REDIRECT_URI);
 console.log("AUTH_URL:", process.env.AUTH_URL);
 
