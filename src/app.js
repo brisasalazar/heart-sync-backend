@@ -10,7 +10,7 @@ const { logger, loggerMiddleware } = require('./util/logger');
 const { authenticateToken } = require("./util/jwt");
 
 console.log("CLIENT_ID:", process.env.CLIENT_ID);
-console.log("REDIRECT_URI:", process.env.REDIRECT_URL);
+console.log("REDIRECT_URI:", process.env.REDIRECT_URI);
 console.log("AUTH_URL:", process.env.AUTH_URL);
 console.log("CLIENT_SECRET:", process.env.CLIENT_SECRET);
 console.log("TOKEN_URL:", process.env.TOKEN_URL);
