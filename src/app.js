@@ -9,6 +9,13 @@ const bodyParser = require("body-parser");
 const { logger, loggerMiddleware } = require('./util/logger');
 const { authenticateToken } = require("./util/jwt");
 
+console.log("CLIENT_ID:", process.env.CLIENT_ID);
+console.log("REDIRECT_URI:", process.env.REDIRECT_URL);
+console.log("AUTH_URL:", process.env.AUTH_URL);
+// console.log("AUTH_URL:", process.env.AUTH_URL);
+// console.log("AUTH_URL:", process.env.AUTH_URL);
+// console.log("AUTH_URL:", process.env.AUTH_URL);
+
 
 // import the necessary functions from the user controller
 const userController = require("./controller/userController");
