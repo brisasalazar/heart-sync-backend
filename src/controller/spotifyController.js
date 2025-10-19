@@ -1,4 +1,4 @@
-require('dotenv').config("home/ubuntu/heart-sync-backend/.env");
+require('dotenv').config();
 
 const express = require("express");
 const { getUser, getTokenInfo, refreshToken, getPlaylists, getSpotifyPlaylistbyPlaylistId, createPlaylist, getTrackURI, addTracksToPlaylist } = require("../service/spotifyService.js");
