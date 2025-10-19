@@ -31,6 +31,7 @@ spotifyController.get("/login", (req, res) => {
 
 spotifyController.get("/callback", async (req, res) => {
     const code = req.query.code;
+    console.log(code);
 
     const tokenInfo = await getTokenInfo(code);
 
