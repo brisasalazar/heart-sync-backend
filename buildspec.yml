@@ -19,7 +19,7 @@ phases:
       nodejs: 18
     commands:
       - npm install
-  pre-build:
+  pre_build:
     commands: 
       - echo PORT=${PORT} >> .env
       - echo REDIRECT_URI=${REDIRECT_URI} >> .env
