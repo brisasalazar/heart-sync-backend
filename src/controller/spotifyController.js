@@ -17,7 +17,7 @@ spotifyController.get("/login", (req, res) => {
     const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
 
     const params = new URLSearchParams({
-        "client_id": process.env.CLIENT_ID,
+        "client_id": "5ab34e587e6347e293017038e27f5f98",
         "response_type": "code",
         "scope": scope,
         "redirect_uri": process.env.REDIRECT_URI,
